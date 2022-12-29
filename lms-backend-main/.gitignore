@@ -1,0 +1,6 @@
+**/__pycache__/*
+**/migrations
+**/migrations/
+db.sqlite3
+**/env/**
+**/LMS/__pycache__/**
