@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from LMS.encode import  decrypt_text, encrypt_text
 from core_app.aws_interface import get_assessment_files, upload_assessment_file
-from core_app.models import StudentCourse
+# from core_app.models import StudentCourse
 from core_app.serializers import StudentCourseSerializer
 
 from products.models import CourseDetails
