@@ -35,6 +35,39 @@ const addToCart = (product) => {
       return error.response;
     });
 };
+const couponVerification = (couponCode) => {
+  return api
+    .get(`/coupon/${couponCode}`)
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      return error.response;
+    });
+};
+const addCoupon = (couponCode) => {
+  console.log({ ...couponCode });
+  return api
+    .post("/coupon", {
+      ...couponCode
+    })
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      return error.response;
+    });
+};
+const showCoupons = (couponCode) => {
+  return api
+    .get("/coupon")
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      return error.response;
+    });
+};
 
 // const enquire = (data) => {
 //   return api.post("/enquire", {
@@ -48,6 +81,7 @@ const addToCart = (product) => {
 //   });
 // };
 const checkout = (data) => {
+  console.log(data, "datasss ");
   return api
     .post("/checkout", {
       ...data
@@ -77,7 +111,10 @@ const CartService = {
   deleteCart,
   addToCart,
   checkout,
-  validateTransaction
+  validateTransaction,
+  couponVerification,
+  addCoupon,
+  showCoupons
 };
 
 export default CartService;

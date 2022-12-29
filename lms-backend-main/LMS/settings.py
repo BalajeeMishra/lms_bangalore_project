@@ -30,6 +30,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+USE_TZ = True
+TIME_ZONE = 'Asia/Kolkata'
 
 # Application definition
 
@@ -45,9 +47,11 @@ INSTALLED_APPS = [
     'core_app',
     'authentication',
     'products',
-    'purchase'
-]
+    'purchase',
+    'coupons',
 
+]
+#  "django-filters"
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
@@ -94,8 +98,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'lms_prod',
         'USER': 'postgres',
-        #  'PASSWORD': 'CaprA4rEgEbRUtrIxAch',
         'PASSWORD': 'Balajee123',
+        # 'PASSWORD': 'CaprA4rEgEbRUtrIxAch',
         # 'HOST': '3.111.73.127',
         'HOST': 'localhost',
         'PORT': '5432',
@@ -251,3 +255,11 @@ CC_AVENUE_REDIRECT_URL = "http://localhost/checkout"
 CC_AVENUE_CANCEL_URL = "http://localhost/checkout"
 
 TEXT_DECODE_SECRET_KEY = 'rHPbPJBI8ZeTGBZqrhX8yDDiFrAom9aTDui1omgX7hg='
+
+COUPON_PERMISSIONS = {
+    'CREATE': ['groupa', 'groupb'],
+    'LIST': ['groupa'],
+    'DELETE': ['groupb'],
+    'UPDATE': ['groupb'],
+    'REDEEMED': ['groupc'],
+}

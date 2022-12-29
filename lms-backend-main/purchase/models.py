@@ -1,9 +1,10 @@
 import uuid
 from django.db import models
-
+from django.core.validators import MinValueValidator, MaxValueValidator
 from core_app.models import Course, Student, User
 from products.models import CourseDetails
 
+from coupons.models import Coupon
 # Create your models here.
 
 
@@ -40,9 +41,10 @@ class TransactionInfo(models.Model):
     street = models.TextField()
     address = models.TextField()
     note = models.TextField(blank=True)
-    total_amount =  models.DecimalField(max_digits=10, decimal_places=2)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     coupon = models.TextField(blank=True)
-    coupon_price = models.DecimalField(max_digits=10, decimal_places=2,blank=True)
+    discount = models.IntegerField(blank=True, validators=[
+                                   MinValueValidator(0), MaxValueValidator(100)])
     final_amount = models.DecimalField(max_digits=10, decimal_places=2)
 
     status = models.TextField(blank=True, default='Pending')

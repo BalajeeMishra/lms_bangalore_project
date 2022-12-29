@@ -31,6 +31,9 @@ import tempfile
 import mimetypes
 from django.http.response import HttpResponse
 
+from django.utils.timezone import now
+
+
 # https://github.com/JoeyAlpha5/django-zoom-meetings
 
 API_KEY = settings.API_KEY

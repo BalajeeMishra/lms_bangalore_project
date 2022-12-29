@@ -33,8 +33,9 @@ urlpatterns = [
     #      name ='token_obtain_pair'),
     path('refresh',
          jwt_views.TokenRefreshView.as_view(),
-         name ='token_refresh'),
+         name='token_refresh'),
     path('', include('core_app.urls')),
+    path('', include('coupons.urls')),
     path('', include('products.urls')),
     path('', include('purchase.urls')),
-]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -4,10 +4,9 @@ import * as county_state from "../public/assets/files/countries+states.json";
 import { useEffect } from "react";
 import { useState } from "react";
 import CartService from "./api/cart.service";
-import { Modal } from "react-bootstrap";
+import { Modal, ResponsiveEmbed } from "react-bootstrap";
 import { useRouter } from "next/router";
 import Link from "next/link";
-
 const Checkout = () => {
   const router = useRouter();
 
@@ -17,10 +16,17 @@ const Checkout = () => {
   const [discount, setDiscount] = useState(0);
   const [openPaymentModal, setOpenPaymentModal] = useState(false);
 
-  function submitCoupon(e) {
-    e.preventDefault();
-    console.log(e, "hellooo");
+  async function submitCoupon() {
+    console.log(couponCode, "hjkhlugig");
+    const response = await CartService.couponVerification(couponCode);
+    console.log(response, "responseeeeeee bbaohuugi");
+    if (response.status == 200) {
+      console.log(response, "responseeeeeee bbaohuugi");
+      alert("matchedddd");
+    }
+    // e.preventDefault();
   }
+
   const [modalText, setModalText] = useState({
     heading: "Payment",
     context: "Thank you for your order.<br/> We are now redirecting you to CcAvenue to make payment."
@@ -478,21 +484,22 @@ const Checkout = () => {
                 )}
                 {couponForm && (
                   <div>
-                    <form onSubmit={submitCoupon} id="coupon-form" name="coupon-form" className="checkout-form">
-                      <input
-                        id="couponcode"
-                        name="couponcode"
-                        onChange={(e) => {
-                          setCouponCode(e.target.value);
-                        }}
-                        type="text"
-                        className="form-control"
-                        placeholder="Enter coupon code"
-                      />
-                      <button type="submit" className="theme-btn mt-30 w-30">
-                        Apply
-                      </button>
-                    </form>
+                    {/* <form onSubmit={submitCoupon} id="coupon-form" name="coupon-form" className="checkout-form">
+                    </form> */}
+                    <input
+                      id="couponcode"
+                      name="couponcode"
+                      onChange={(e) => {
+                        setCouponCode(e.target.value);
+                      }}
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter coupon code"
+                      onClick={submitCoupon}
+                    />
+                    {/* <button type="submit" onSubmit={submitCoupon} className="theme-btn mt-3 w-30">
+                      Apply
+                    </button> */}
                   </div>
                 )}
 

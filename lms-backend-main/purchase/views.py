@@ -1,10 +1,11 @@
+import json
 import time
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
-from LMS.encode import  decrypt_text, encrypt_text
+from LMS.encode import decrypt_text, encrypt_text
 from core_app.aws_interface import get_assessment_files, upload_assessment_file
 from core_app.models import StudentCourse
 from core_app.serializers import StudentCourseSerializer
@@ -20,16 +21,16 @@ import uuid
 cc_avenue_redirect_url = settings.CC_AVENUE_REDIRECT_URL
 cc_avenue_cancel_url = settings.CC_AVENUE_CANCEL_URL
 cc_avenue_access_code = settings.CC_AVENUE_ACCESS_CODE
-import json
+
 
 class CartOperations(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
         request.data['user'] = request.user.id
-        if Cart.objects.filter(user=request.user.id,product_id=request.data['product']).exists():
+        if Cart.objects.filter(user=request.user.id, product_id=request.data['product']).exists():
             return Response({"message": "Selected product already exist in cart"}, status=409)
-        
+
         serializer = CartCreate(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -69,7 +70,6 @@ class DoCheckout(APIView):
     def post(self, request):
         request.data['user'] = request.user.id
         transaction_id = uuid.uuid4()
-       
         request.data['id'] = transaction_id
         transaction_info_serializer = TransactionCreate(data=request.data)
         if transaction_info_serializer.is_valid():
@@ -79,10 +79,12 @@ class DoCheckout(APIView):
             plainText = ''
             for j in cc_data:
                 plainText += "%s=%s&" % (j, cc_data[j])
-            plainText += "cancel_url=%s&" % (cc_avenue_cancel_url+"?app_code="+encrypt_text(json.dumps({"transaction_id":str(transaction_id),"success":False})))
-            plainText += "redirect_url=%s&" % (cc_avenue_redirect_url+"?app_code="+encrypt_text(json.dumps({"transaction_id":str(transaction_id),"success":True})))
+            plainText += "cancel_url=%s&" % (cc_avenue_cancel_url+"?app_code="+encrypt_text(
+                json.dumps({"transaction_id": str(transaction_id), "success": False})))
+            plainText += "redirect_url=%s&" % (cc_avenue_redirect_url+"?app_code="+encrypt_text(
+                json.dumps({"transaction_id": str(transaction_id), "success": True})))
             encrypted_data = cc_avenue_encrypt(plainText)
-            
+
             payment_url = 'https://secure.ccavenue.com/transaction/transaction.do?command=initiateTransaction&encRequest=%s&access_code=%s' % (
                 encrypted_data, settings.CC_AVENUE_ACCESS_CODE)
             data['request'] = encrypted_data
@@ -105,41 +107,49 @@ class DoCheckout(APIView):
             return Response({"message": "Invalid Data2", "error": transaction_info_serializer.errors}, status=400)
 
 
-
-
 class ValidatingTransaction(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
         request.data['user'] = request.user.id
-        decrypted_data=decrypt_text(request.data['app_code'])
-        data=json.loads(decrypted_data)
+        decrypted_data = decrypt_text(request.data['app_code'])
+        data = json.loads(decrypted_data)
         if data['success']:
-            TransactionInfo.objects.filter(id=data['transaction_id']).update(status="Success")
-            OrderItem.objects.filter(order_id=data['transaction_id']).update(status="Success")
-            orders=OrderItem.objects.filter(order_id=data['transaction_id']).values()
-            student_course=list()
+            TransactionInfo.objects.filter(
+                id=data['transaction_id']).update(status="Success")
+            OrderItem.objects.filter(
+                order_id=data['transaction_id']).update(status="Success")
+            orders = OrderItem.objects.filter(
+                order_id=data['transaction_id']).values()
+            student_course = list()
             for order in orders:
-                student_course.append({"course":order['product_id_id'],"student":order['user_id']})
-                
-            student_course=StudentCourseSerializer(data=student_course,many=True)
+                student_course.append(
+                    {"course": order['product_id_id'], "student": order['user_id']})
+
+            student_course = StudentCourseSerializer(
+                data=student_course, many=True)
             if student_course.is_valid():
                 student_course.save()
                 Cart.objects.filter(user=request.user.id).delete()
             else:
-                return Response({"message": "Failed while mapping to student","success":False,"error":student_course.errors}, status=200)
-            return Response({"message": "Payment Success","success":True}, status=200)
+                return Response({"message": "Failed while mapping to student", "success": False, "error": student_course.errors}, status=200)
+            return Response({"message": "Payment Success", "success": True}, status=200)
         else:
-            TransactionInfo.objects.filter(id=data['transaction_id']).update(status="Failed")
-            OrderItem.objects.filter(order_id=data['transaction_id']).update(status="Failed")
-            return Response({"message": "Payment Failed","success":False}, status=200)
+            TransactionInfo.objects.filter(
+                id=data['transaction_id']).update(status="Failed")
+            OrderItem.objects.filter(
+                order_id=data['transaction_id']).update(status="Failed")
+            return Response({"message": "Payment Failed", "success": False}, status=200)
+
 
 def build_cc_avenue_params(data):
-    cc_data={}
-    cc_data['currency'] = 'INR' 
+    cc_data = {}
+    cc_data['currency'] = 'INR'
     cc_data['amount'] = int(data['final_amount'])
-    cc_data['billing_name'] = ("%s %s" % (data['first_name'], data['last_name']))
-    cc_data['billing_address'] = ("%s , %s" % (data['street'], data['address']))
+    cc_data['billing_name'] = ("%s %s" % (
+        data['first_name'], data['last_name']))
+    cc_data['billing_address'] = (
+        "%s , %s" % (data['street'], data['address']))
     cc_data['billing_city'] = ("%s" % (data['city']))
     cc_data['billing_state'] = ("%s" % (data['state']))
     cc_data['billing_zip'] = ("%s" % (data['zipcode']))
