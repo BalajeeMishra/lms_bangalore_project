@@ -68,7 +68,7 @@ class DoCheckout(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        print(request)
+        print(request.data)
         request.data['user'] = request.user.id
         transaction_id = uuid.uuid4()
         request.data['id'] = transaction_id

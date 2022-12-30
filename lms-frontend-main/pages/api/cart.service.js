@@ -118,5 +118,3 @@ const CartService = {
 };
 
 export default CartService;
-
-export default CartService;
