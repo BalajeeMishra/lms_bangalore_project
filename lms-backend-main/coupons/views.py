@@ -51,7 +51,9 @@ class CouponViewSet(viewsets.ModelViewSet):
     API endpoint that lets you create, delete, retrieve coupons.
     """
     permission_classes = [IsAuthenticated]
-    filter_backends = (filters.SearchFilter, DjangoFilterBackend)
+    filter_backends = (filters.SearchFilter,
+                       filters.OrderingFilter, DjangoFilterBackend)
+    ordering_fields = ('updated_at', 'code_l')
     search_fields = ('code', 'code_l')
     serializer_class = CouponSerializer
 
@@ -61,7 +63,6 @@ class CouponViewSet(viewsets.ModelViewSet):
         """
 
         qs_all = Coupon.objects.all()
-        qs_some = Coupon.objects.filter(active=True)
 
         for object in qs_all:
             object.save()
