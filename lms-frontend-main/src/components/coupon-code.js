@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Modal from "./modal/Modal";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Form from "react-bootstrap/Form";
 import { Button, Col, Row } from "react-bootstrap";
@@ -9,14 +10,34 @@ import FacultyService from "../../pages/api/faculty.service";
 import AdminService from "../../pages/api/admin.service";
 import AddCouponCode from "./add_coupon_code";
 import CartService from "../../pages/api/cart.service";
-
+import EditCouponCode from "./edit_coupon_code";
+import { useRouter } from "next/router";
+import Link from "next/link";
 function CouponCode(props) {
   const [addButton, setAddButton] = useState(false);
   const [allCode, setAllCode] = useState([]);
-
+  const [openedit, setOpenEdit] = useState(false);
+  const [codeData, setCodeData] = useState({});
+  const router = useRouter();
   useEffect(() => {
     fn();
   }, []);
+
+  function editHandler(c) {
+    setOpenEdit(true);
+    setCodeData(c);
+  }
+
+  async function deleteHandler(id) {
+    const response = await CartService.deleteCoupon(id);
+    if (response.status == 204) {
+      toast.success(" Coupon Code deleted successfully");
+      router.push("/admin-dashboard");
+    }
+    if (response.status != 204) {
+      return toast.error("something went wrong!!Please try again");
+    }
+  }
 
   async function fn() {
     const response = await CartService.showCoupons();
@@ -25,7 +46,9 @@ function CouponCode(props) {
   }
   return (
     <>
-      {!addButton ? (
+      {openedit ? (
+        <EditCouponCode codeData={codeData} />
+      ) : !addButton ? (
         <section class="container-fluid py-5">
           <div class="row">
             <div class="col col-9">
@@ -55,8 +78,20 @@ function CouponCode(props) {
                         <td class="text-center">{c.discount}</td>
                         <td class="text-center">{c.active ? "✅" : "❌"}</td>
                         <td class="text-center">
-                          <a href="">📝</a>
-                          <a href="">🗑️</a>
+                          <a
+                            onClick={() => {
+                              editHandler(c);
+                            }}
+                          >
+                            📝
+                          </a>
+                          <a
+                            onClick={() => {
+                              deleteHandler(c.id);
+                            }}
+                          >
+                            🗑️
+                          </a>
                         </td>
                       </tr>
                     ))}

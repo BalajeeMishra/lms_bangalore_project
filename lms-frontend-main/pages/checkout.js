@@ -13,11 +13,10 @@ const Checkout = () => {
   const router = useRouter();
   const [cartList, setCartList] = useState([]);
   const [couponForm, setCouponForm] = useState(false);
-  const [couponCode, setCouponCode] = useState(0);
+  const [couponCode, setCouponCode] = useState("");
   const [discount, setDiscount] = useState(0);
   const [priceAfterDiscount, setPriceAfterDiscount] = useState(0);
   const [openPaymentModal, setOpenPaymentModal] = useState(false);
-
   const [modalText, setModalText] = useState({
     heading: "Payment",
     context: "Thank you for your order.<br/> We are now redirecting you to CcAvenue to make payment."
@@ -38,22 +37,20 @@ const Checkout = () => {
     address: "",
     note: "",
     total_amount: 0,
-    coupon: "",
-    coupon_price: 0,
+    coupon: couponCode,
+    discount,
     final_amount: 0,
     cart: []
   });
 
   // useEffect(() => {
-  //   setCheckout({ total_amount: checkout?.total_amount - (discount * checkout?.total_amount) / 100 });
+  //   setPriceAfterDiscount(checkout?.total_amount - (discount * checkout?.total_amount) / 100);
   // }, [discount]);
 
   async function submitCoupon(e) {
     e.preventDefault();
     const response = await CartService.couponVerification(couponCode);
-    console.log(response, "response");
     if (response.status == 200) {
-      toast.success("Coupon code applied");
       setDiscount(response.data.discount);
     }
   }
@@ -82,11 +79,11 @@ const Checkout = () => {
       setCheckout((prevState) => ({
         ...prevState,
         total_amount: temp_total,
-        final_amount: temp_total,
+        final_amount: temp_total - (temp_total * discount) / 100,
         cart: cartList
       }));
     }
-  }, [cartList]);
+  }, [cartList, discount]);
   const getCartInfo = () => {
     CartService.getCartInfo()
       .then((res) => {

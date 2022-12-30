@@ -1,18 +1,15 @@
-import React from "react";
-import React, { useState } from "react";
-import CartService from "../../pages/api/cart.service";
+import React, { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import CartService from "../../pages/api/cart.service";
-import Link from "next/link";
-const EditCouponCode = () => {
-  const [couponCode, setCouponCode] = useState("");
-  const [discount, setDiscount] = useState(0);
-  const [validFrom, setValidFrom] = useState("");
-  const [validTo, setValidTo] = useState("");
-  const [active, setActive] = useState(true);
+const EditCouponCode = ({ codeData }) => {
+  const [couponCode, setCouponCode] = useState(codeData.code);
+  const [discount, setDiscount] = useState(codeData.discount);
+  const [validFrom, setValidFrom] = useState(codeData.valid_from);
+  const [validTo, setValidTo] = useState(codeData.valid_to);
+  const [active, setActive] = useState(codeData.active);
   const router = useRouter();
 
   var isActiveOrNot = [
@@ -20,23 +17,30 @@ const EditCouponCode = () => {
     { value: false, name: "Disabled" }
   ];
 
+  async function findData() {}
+
+  // useEffect(() => {
+  //   console.log(validTo.slice(0, validTo.length - 4));
+  // }, []);
+
   const submitCodeData = async (e) => {
     e.preventDefault();
     if (!couponCode || !discount || !validFrom || !validTo) {
       return toast.warn("Please enter all the data carefully");
     }
-    const response = await CartService.addCoupon({
+    const response = await CartService.editCoupon({
+      id: codeData.id,
       code: couponCode,
       discount: discount,
-      valid_from: validFrom,
-      valid_to: validTo,
+      valid_from: validFrom.slice(0, validFrom.length - 4),
+      valid_to: validTo.slice(0, validTo.length - 4),
       active: active
     });
-    if (response.status == 200) {
-      toast.success("Success: Coupon Code added successfully");
+    if (response.status == 202) {
+      toast.success("Coupon Code edited successfully");
       router.push("/admin-dashboard");
     }
-    if (response.status != 200) {
+    if (response.status != 202) {
       return toast.error("something went wrong!!Please try again");
     }
   };
@@ -71,6 +75,7 @@ const EditCouponCode = () => {
                       name="coupon"
                       id="coupon"
                       placeholder="Coupone Code"
+                      value={couponCode}
                     />
                   </div>
                   <div class="col col-4 mb-3">
@@ -84,6 +89,7 @@ const EditCouponCode = () => {
                       name="discountinpercentage"
                       id="discountinpercentage"
                       placeholder="in %"
+                      value={discount}
                     />
                   </div>
                   <div class="col col-4 mb-3">
@@ -92,10 +98,11 @@ const EditCouponCode = () => {
                       class="form-control rounded-0"
                       type="datetime-local"
                       onChange={(e) => {
-                        setValidFrom(e.target.value);
+                        setValidFrom(e.target.value + ":00z");
                       }}
                       name="valid_from"
                       id="valid_from"
+                      value={validFrom.slice(0, validFrom.length - 4)}
                     />
                   </div>
                   <div class="col col-4 mb-3">
@@ -104,10 +111,11 @@ const EditCouponCode = () => {
                       class="form-control rounded-0"
                       type="datetime-local"
                       onChange={(e) => {
-                        setValidTo(e.target.value);
+                        setValidTo(e.target.value + ":00z");
                       }}
                       name="valid_to"
                       id="valid_to"
+                      value={validTo.slice(0, validTo.length - 4)}
                     />
                   </div>
                   <div class="col col-3 mb-3">
@@ -119,7 +127,7 @@ const EditCouponCode = () => {
                           class="form-control rounded-0"
                           name="isActiveOrNot"
                           id="isActiveOrNot"
-                          checked
+                          checked={active}
                           onChange={() => {
                             setActive(true);
                           }}
@@ -133,6 +141,7 @@ const EditCouponCode = () => {
                           class="form-control rounded-0"
                           name="isActiveOrNot"
                           id="isActiveOrNot"
+                          checked={!active}
                           onChange={() => {
                             setActive(false);
                           }}
