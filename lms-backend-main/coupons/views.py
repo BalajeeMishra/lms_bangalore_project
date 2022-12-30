@@ -117,7 +117,7 @@ class CouponViewSet(viewsets.ModelViewSet):
 
         serializer = CouponSerializer(coupon, context={'request': request})
 
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update(self, request, pk=None, **kwargs):
         """

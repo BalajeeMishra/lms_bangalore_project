@@ -42,8 +42,8 @@ class TransactionInfo(models.Model):
     address = models.TextField()
     note = models.TextField(blank=True)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    coupon = models.TextField(blank=True)
-    discount = models.IntegerField(blank=True, validators=[
+    coupon = models.TextField(blank=True, null=True)
+    discount = models.IntegerField(blank=True, null=True, validators=[
                                    MinValueValidator(0), MaxValueValidator(100)])
     final_amount = models.DecimalField(max_digits=10, decimal_places=2)
 
