@@ -9,16 +9,18 @@ import FacultyService from "../../pages/api/faculty.service";
 import AdminService from "../../pages/api/admin.service";
 import AddCouponCode from "./add_coupon_code";
 import CartService from "../../pages/api/cart.service";
+
 function CouponCode(props) {
   const [addButton, setAddButton] = useState(false);
   const [allCode, setAllCode] = useState([]);
+
   useEffect(() => {
     fn();
   }, []);
 
   async function fn() {
     const response = await CartService.showCoupons();
-    console.log(response.data);
+
     setAllCode(response.data);
   }
   return (
@@ -39,7 +41,7 @@ function CouponCode(props) {
                         Discount (in %)
                       </th>
                       <th scope="col" class="text-center">
-                        Active
+                        Status
                       </th>
                       <th scope="col" class="text-center">
                         Action.
@@ -54,6 +56,7 @@ function CouponCode(props) {
                         <td class="text-center">{c.active ? "✅" : "❌"}</td>
                         <td class="text-center">
                           <a href="">📝</a>
+                          <a href="">🗑️</a>
                         </td>
                       </tr>
                     ))}

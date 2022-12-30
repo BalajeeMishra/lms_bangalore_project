@@ -6,31 +6,23 @@ import { useState } from "react";
 import CartService from "./api/cart.service";
 import { Modal, ResponsiveEmbed } from "react-bootstrap";
 import { useRouter } from "next/router";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Link from "next/link";
 const Checkout = () => {
   const router = useRouter();
-
   const [cartList, setCartList] = useState([]);
   const [couponForm, setCouponForm] = useState(false);
   const [couponCode, setCouponCode] = useState(0);
   const [discount, setDiscount] = useState(0);
+  const [priceAfterDiscount, setPriceAfterDiscount] = useState(0);
   const [openPaymentModal, setOpenPaymentModal] = useState(false);
-
-  async function submitCoupon() {
-    console.log(couponCode, "hjkhlugig");
-    const response = await CartService.couponVerification(couponCode);
-    console.log(response, "responseeeeeee bbaohuugi");
-    if (response.status == 200) {
-      console.log(response, "responseeeeeee bbaohuugi");
-      alert("matchedddd");
-    }
-    // e.preventDefault();
-  }
 
   const [modalText, setModalText] = useState({
     heading: "Payment",
     context: "Thank you for your order.<br/> We are now redirecting you to CcAvenue to make payment."
   });
+
   const [checkout, setCheckout] = useState({
     first_name: "",
     last_name: "",
@@ -51,6 +43,21 @@ const Checkout = () => {
     final_amount: 0,
     cart: []
   });
+
+  // useEffect(() => {
+  //   setCheckout({ total_amount: checkout?.total_amount - (discount * checkout?.total_amount) / 100 });
+  // }, [discount]);
+
+  async function submitCoupon(e) {
+    e.preventDefault();
+    const response = await CartService.couponVerification(couponCode);
+    console.log(response, "response");
+    if (response.status == 200) {
+      toast.success("Coupon code applied");
+      setDiscount(response.data.discount);
+    }
+  }
+
   useEffect(() => {
     getCartInfo();
   }, []);
@@ -466,6 +473,29 @@ const Checkout = () => {
                           <strong>${checkout?.total_amount}</strong>
                         </td>
                       </tr>
+                      {discount ? (
+                        <>
+                          <tr>
+                            <td>
+                              <strong>Discount applied</strong>
+                            </td>
+                            <td>
+                              <strong>{discount}%</strong>
+                            </td>
+                          </tr>
+
+                          <tr>
+                            <td>
+                              <strong>Now Total</strong>
+                            </td>
+                            <td>
+                              <strong>${checkout?.total_amount - (discount * checkout?.total_amount) / 100}</strong>
+                            </td>
+                          </tr>
+                        </>
+                      ) : (
+                        ""
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -482,10 +512,9 @@ const Checkout = () => {
                     </a>
                   </div>
                 )}
-                {couponForm && (
+
+                {couponForm && !discount && (
                   <div>
-                    {/* <form onSubmit={submitCoupon} id="coupon-form" name="coupon-form" className="checkout-form">
-                    </form> */}
                     <input
                       id="couponcode"
                       name="couponcode"
@@ -495,15 +524,13 @@ const Checkout = () => {
                       type="text"
                       className="form-control"
                       placeholder="Enter coupon code"
-                      onClick={submitCoupon}
                     />
-                    {/* <button type="submit" onSubmit={submitCoupon} className="theme-btn mt-3 w-30">
+                    <button type="button" onClick={submitCoupon} className="theme-btn mt-3 w-30">
                       Apply
-                    </button> */}
+                    </button>
                   </div>
                 )}
 
-                {/*  */}
                 {/* <h5 className="title mt-20 mb-15">Payment Method</h5>
                 <div className="form-group">
                   <select name="payment" id="payment">
