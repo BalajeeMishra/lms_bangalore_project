@@ -35,7 +35,7 @@ const addToCart = (product) => {
       return error.response;
     });
 };
-const couponVerification = (couponCode) => {
+const couponVerification = async (couponCode) => {
   return api
     .get(`/coupon/${couponCode}`)
     .then((response) => {
@@ -45,8 +45,7 @@ const couponVerification = (couponCode) => {
       return error.response;
     });
 };
-const addCoupon = (couponCode) => {
-  console.log({ ...couponCode });
+const addCoupon = async (couponCode) => {
   return api
     .post("/coupon", {
       ...couponCode
@@ -58,7 +57,7 @@ const addCoupon = (couponCode) => {
       return error.response;
     });
 };
-const showCoupons = (couponCode) => {
+const showCoupons = async (couponCode) => {
   return api
     .get("/coupon")
     .then((response) => {
