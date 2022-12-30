@@ -48,9 +48,10 @@ INSTALLED_APPS = [
     'authentication',
     'products',
     'purchase',
-    'coupons',
-
+    'coupons'
+    
 ]
+
 #  "django-filters"
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -98,7 +99,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'lms_prod',
         'USER': 'postgres',
-        'PASSWORD': 'Balajee123',
+        'PASSWORD': 'abc123',
         # 'PASSWORD': 'CaprA4rEgEbRUtrIxAch',
         # 'HOST': '3.111.73.127',
         'HOST': 'localhost',
