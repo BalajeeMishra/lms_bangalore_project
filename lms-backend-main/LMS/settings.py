@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'products',
     'purchase',
     'coupons'
+    
 ]
 
 #  "django-filters"
