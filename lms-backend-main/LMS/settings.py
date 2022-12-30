@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'coupons'
 ]
 
+#  "django-filters"
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',

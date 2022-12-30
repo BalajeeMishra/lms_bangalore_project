@@ -1,21 +1,35 @@
 import PageBanner from "../src/components/PageBanner";
 import Layout from "../src/layout/Layout";
-import * as county_state from "../public/assets/files/countries+states.json"
+import * as county_state from "../public/assets/files/countries+states.json";
 import { useEffect } from "react";
 import { useState } from "react";
 import CartService from "./api/cart.service";
-import { Modal } from "react-bootstrap";
+import { Modal, ResponsiveEmbed } from "react-bootstrap";
 import { useRouter } from "next/router";
+import Link from "next/link";
 const Checkout = () => {
-  const router = useRouter()
+  const router = useRouter();
 
   const [cartList, setCartList] = useState([]);
-  const [coupon, setCoupon] = useState(0);
+  const [couponForm, setCouponForm] = useState(false);
+  const [couponCode, setCouponCode] = useState(0);
   const [discount, setDiscount] = useState(0);
   const [openPaymentModal, setOpenPaymentModal] = useState(false);
+
+  async function submitCoupon() {
+    console.log(couponCode, "hjkhlugig");
+    const response = await CartService.couponVerification(couponCode);
+    console.log(response, "responseeeeeee bbaohuugi");
+    if (response.status == 200) {
+      console.log(response, "responseeeeeee bbaohuugi");
+      alert("matchedddd");
+    }
+    // e.preventDefault();
+  }
+
   const [modalText, setModalText] = useState({
-    heading:"Payment",
-    context:"Thank you for your order.<br/> We are now redirecting you to CcAvenue to make payment."
+    heading: "Payment",
+    context: "Thank you for your order.<br/> We are now redirecting you to CcAvenue to make payment."
   });
   const [checkout, setCheckout] = useState({
     first_name: "",
@@ -38,33 +52,32 @@ const Checkout = () => {
     cart: []
   });
   useEffect(() => {
-    getCartInfo()
-  }, [])
+    getCartInfo();
+  }, []);
   useEffect(() => {
-    if(router?.query?.app_code ||router?.query?.code){
-      console.log("router?.query?.code",router?.query?.code)
+    if (router?.query?.app_code || router?.query?.code) {
+      console.log("router?.query?.code", router?.query?.code);
       setModalText({
-        heading:"Payment",
-        context:"Validating the data"
-      })
-      setOpenPaymentModal(true)
-      validateTransaction(router?.query)
-    }else{
-
+        heading: "Payment",
+        context: "Validating the data"
+      });
+      setOpenPaymentModal(true);
+      validateTransaction(router?.query);
+    } else {
     }
-  }, [router.query])
+  }, [router.query]);
   useEffect(() => {
     if (cartList) {
       let temp_total = 0;
       cartList?.forEach((cart_list) => {
         temp_total += +cart_list?.product?.price?.price;
       });
-      setCheckout(prevState => ({
+      setCheckout((prevState) => ({
         ...prevState,
         total_amount: temp_total,
         final_amount: temp_total,
         cart: cartList
-      }))
+      }));
     }
   }, [cartList]);
   const getCartInfo = () => {
@@ -83,21 +96,21 @@ const Checkout = () => {
     CartService.validateTransaction(data)
       .then((res) => {
         if (res && res.status === 200) {
-          console.log("dadasdsa",res.data)
-          let data=res?.data
-          if(data?.success){
+          console.log("dadasdsa", res.data);
+          let data = res?.data;
+          if (data?.success) {
             setModalText({
-              heading:"Payment received",
-              context:"Your transaction was successful!,<br/> Page will be redirected to home in 5 Seconds"
-            })
+              heading: "Payment received",
+              context: "Your transaction was successful!,<br/> Page will be redirected to home in 5 Seconds"
+            });
             setTimeout(() => {
               router.push("/");
             }, 5000);
-          }else{
+          } else {
             setModalText({
-              heading:"Payment Failed",
-              context:"Your transaction was failed!,<br/> Page will be redirected to cart in 5 Seconds"
-            })
+              heading: "Payment Failed",
+              context: "Your transaction was failed!,<br/> Page will be redirected to cart in 5 Seconds"
+            });
             setTimeout(() => {
               router.push("/cart");
             }, 5000);
@@ -110,25 +123,23 @@ const Checkout = () => {
       });
   };
 
-
   const doCheckout = (e) => {
-    e.preventDefault()
-    setOpenPaymentModal(true)
+    e.preventDefault();
+    setOpenPaymentModal(true);
     setModalText({
-      heading:"Payment",
-      context:"Thank you for your order. We are now redirecting you to CcAvenue to make payment."
-    })
+      heading: "Payment",
+      context: "Thank you for your order. We are now redirecting you to CcAvenue to make payment."
+    });
     CartService.checkout(checkout)
       .then((res) => {
         if (res && res.status === 200) {
           console.log(res.data.payment_url);
           setTimeout(() => {
             // window.open(res.data.payment_url,"_target")
-            window.location.href =res.data.payment_url
-            
+            window.location.href = res.data.payment_url;
           }, 2000);
-        }else{
-          setOpenPaymentModal(false)
+        } else {
+          setOpenPaymentModal(false);
         }
       })
       .catch((e) => {
@@ -141,12 +152,7 @@ const Checkout = () => {
     <Layout>
       <PageBanner pageName={"Checkout"} />
       <section className="checkout-area pt-130 rpt-95 pb-100 rpb-70">
-        <form
-          onSubmit={(e) => doCheckout(e)}
-          id="payment-method"
-          name="payment-method"
-          className="checkout-form mb-30"
-        >
+        <form onSubmit={(e) => doCheckout(e)} id="payment-method" name="payment-method" className="checkout-form mb-30">
           <div className="container">
             <div className="row">
               <div className="col-lg-8">
@@ -162,11 +168,10 @@ const Checkout = () => {
                         className="form-control"
                         value={checkout?.first_name}
                         onChange={(e) => {
-                          setCheckout(prevState => ({
+                          setCheckout((prevState) => ({
                             ...prevState,
                             first_name: e.target.value
-                          }))
-
+                          }));
                         }}
                         placeholder="First Name"
                         required
@@ -182,11 +187,10 @@ const Checkout = () => {
                         className="form-control"
                         value={checkout?.last_name}
                         onChange={(e) => {
-                          setCheckout(prevState => ({
+                          setCheckout((prevState) => ({
                             ...prevState,
                             last_name: e.target.value
-                          }))
-
+                          }));
                         }}
                         placeholder="Last Name"
                         required
@@ -202,10 +206,10 @@ const Checkout = () => {
                         className="form-control"
                         value={checkout?.phone_number}
                         onChange={(e) => {
-                          setCheckout(prevState => ({
+                          setCheckout((prevState) => ({
                             ...prevState,
                             phone_number: e.target.value
-                          }))
+                          }));
                         }}
                         placeholder="Phone Number"
                         pattern="[1-9][0-9]{9}"
@@ -222,10 +226,10 @@ const Checkout = () => {
                         className="form-control"
                         value={checkout?.email}
                         onChange={(e) => {
-                          setCheckout(prevState => ({
+                          setCheckout((prevState) => ({
                             ...prevState,
                             email: e.target.value
-                          }))
+                          }));
                         }}
                         placeholder="Email Address"
                         pattern="^\S+@\S+\.\S+$"
@@ -242,10 +246,10 @@ const Checkout = () => {
                         className="form-control"
                         value={checkout?.company_name}
                         onChange={(e) => {
-                          setCheckout(prevState => ({
+                          setCheckout((prevState) => ({
                             ...prevState,
                             company_name: e.target.value
-                          }))
+                          }));
                         }}
                         placeholder="Company name (optional)"
                       />
@@ -260,10 +264,10 @@ const Checkout = () => {
                         className="form-control"
                         value={checkout?.company_address}
                         onChange={(e) => {
-                          setCheckout(prevState => ({
+                          setCheckout((prevState) => ({
                             ...prevState,
                             company_address: e.target.value
-                          }))
+                          }));
                         }}
                         placeholder="Company Address (optional)"
                       />
@@ -274,34 +278,44 @@ const Checkout = () => {
                   </div>
                   <div className="col-md-6">
                     <div className="form-group">
-                      <select name="country" id="country" value={checkout?.country} onChange={(e) => {
-                    
-                        setCheckout(prevState => ({
-                          ...prevState,
-                          country: e.target.value
-                        }))
-                        console.log(checkout)
-                      }}>
+                      <select
+                        name="country"
+                        id="country"
+                        value={checkout?.country}
+                        onChange={(e) => {
+                          setCheckout((prevState) => ({
+                            ...prevState,
+                            country: e.target.value
+                          }));
+                          console.log(checkout);
+                        }}
+                      >
                         <option value={null}>Select Country</option>
-                        {county_state.map((a) =>
+                        {county_state.map((a) => (
                           <option value={a.name}>{a?.name}</option>
-                        )}
+                        ))}
                       </select>
                     </div>
                   </div>
                   <div className="col-md-6">
                     <div className="form-group">
-                      <select name="state" id="state" value={checkout?.state}
+                      <select
+                        name="state"
+                        id="state"
+                        value={checkout?.state}
                         onChange={(e) => {
-                          setCheckout(prevState => ({
+                          setCheckout((prevState) => ({
                             ...prevState,
                             state: e.target.value
-                          }))
-                        }}>
+                          }));
+                        }}
+                      >
                         <option value={null}>Select State</option>
-                        {county_state.find(c => c.name == checkout.country)?.states?.map((a) =>
-                          <option value={a.name}>{a?.name}</option>
-                        )}
+                        {county_state
+                          .find((c) => c.name == checkout.country)
+                          ?.states?.map((a) => (
+                            <option value={a.name}>{a?.name}</option>
+                          ))}
                       </select>
                     </div>
                   </div>
@@ -314,10 +328,10 @@ const Checkout = () => {
                         className="form-control"
                         value={checkout?.city}
                         onChange={(e) => {
-                          setCheckout(prevState => ({
+                          setCheckout((prevState) => ({
                             ...prevState,
                             city: e.target.value
-                          }))
+                          }));
                         }}
                         placeholder="City"
                         required=""
@@ -346,10 +360,10 @@ const Checkout = () => {
                         className="form-control"
                         value={checkout?.zipcode}
                         onChange={(e) => {
-                          setCheckout(prevState => ({
+                          setCheckout((prevState) => ({
                             ...prevState,
                             zipcode: e.target.value
-                          }))
+                          }));
                         }}
                         placeholder="Zip"
                         required=""
@@ -365,10 +379,10 @@ const Checkout = () => {
                         className="form-control"
                         value={checkout?.street}
                         onChange={(e) => {
-                          setCheckout(prevState => ({
+                          setCheckout((prevState) => ({
                             ...prevState,
                             street: e.target.value
-                          }))
+                          }));
                         }}
                         placeholder="House, street name"
                         required=""
@@ -384,10 +398,10 @@ const Checkout = () => {
                         className="form-control"
                         value={checkout?.address}
                         onChange={(e) => {
-                          setCheckout(prevState => ({
+                          setCheckout((prevState) => ({
                             ...prevState,
                             address: e.target.value
-                          }))
+                          }));
                         }}
                         placeholder="Apartment, suite, unit etc. (optional)"
                       />
@@ -406,10 +420,10 @@ const Checkout = () => {
                         placeholder="Notes about your order, e.g. special notes for delivery."
                         value={checkout?.note}
                         onChange={(e) => {
-                          setCheckout(prevState => ({
+                          setCheckout((prevState) => ({
                             ...prevState,
                             note: e.target.value
-                          }))
+                          }));
                         }}
                       />
                     </div>
@@ -417,7 +431,6 @@ const Checkout = () => {
                 </div>
               </div>
               <div className="col-lg-4">
-
                 <h3 className="from-title mb-25">Order Summary</h3>
                 {/* <div className="row mb-3 pt-5">
                   <div className="col-8 pr-0 mr-0">
@@ -439,10 +452,12 @@ const Checkout = () => {
                       {cartList?.map((item, index) => (
                         <tr>
                           <td>
-                            {item?.product?.title}<strong> × 1</strong>
+                            {item?.product?.title}
+                            <strong> × 1</strong>
                           </td>
                           <td>${(+item?.product?.price?.price).toFixed(2)}</td>
-                        </tr>))}
+                        </tr>
+                      ))}
                       <tr>
                         <td>
                           <strong>Order Total</strong>
@@ -454,8 +469,41 @@ const Checkout = () => {
                     </tbody>
                   </table>
                 </div>
+                {/* coupon code related */}
+                {!couponForm && (
+                  <div>
+                    <a
+                      style={{ color: "blue" }}
+                      onClick={() => {
+                        setCouponForm(true);
+                      }}
+                    >
+                      Do you have a coupon code?
+                    </a>
+                  </div>
+                )}
+                {couponForm && (
+                  <div>
+                    {/* <form onSubmit={submitCoupon} id="coupon-form" name="coupon-form" className="checkout-form">
+                    </form> */}
+                    <input
+                      id="couponcode"
+                      name="couponcode"
+                      onChange={(e) => {
+                        setCouponCode(e.target.value);
+                      }}
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter coupon code"
+                      onClick={submitCoupon}
+                    />
+                    {/* <button type="submit" onSubmit={submitCoupon} className="theme-btn mt-3 w-30">
+                      Apply
+                    </button> */}
+                  </div>
+                )}
 
-
+                {/*  */}
                 {/* <h5 className="title mt-20 mb-15">Payment Method</h5>
                 <div className="form-group">
                   <select name="payment" id="payment">
@@ -468,26 +516,21 @@ const Checkout = () => {
                 <button type="submit" className="theme-btn mt-30 w-100">
                   Proceed to Payment
                 </button>
-
               </div>
             </div>
           </div>
         </form>
       </section>
 
-
       <Modal show={openPaymentModal} data-backdrop="static" data-keyboard="false">
-        <Modal.Header>
-       {modalText?.heading}
-        </Modal.Header>
+        <Modal.Header>{modalText?.heading}</Modal.Header>
         <Modal.Body>
-          <div dangerouslySetInnerHTML= {{__html:modalText?.context}}></div>
-         
-        {/* Thank you for your order. We are now redirecting you to CcAvenue to make payment. */}
+          <div dangerouslySetInnerHTML={{ __html: modalText?.context }}></div>
+
+          {/* Thank you for your order. We are now redirecting you to CcAvenue to make payment. */}
         </Modal.Body>
       </Modal>
     </Layout>
-
   );
 };
 export default Checkout;

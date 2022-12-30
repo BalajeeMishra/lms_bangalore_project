@@ -69,7 +69,7 @@ class CouponViewSet(viewsets.ModelViewSet):
         if self.request.user.is_staff:
             return qs_all
 
-        return qs_some
+        return qs_all
 
     def create(self, request, **kwargs):
         """
@@ -80,7 +80,7 @@ class CouponViewSet(viewsets.ModelViewSet):
             data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

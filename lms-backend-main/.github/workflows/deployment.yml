@@ -1,0 +1,13 @@
+name: Frontend Development Deploy
+on:
+  push:
+    branches:
+      - development
+jobs:
+  development:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Start Development docker up
+        run: |
+          docker-compose -f docker-compose.dev.yml up -d --build
