@@ -1,4 +1,5 @@
-import requests,os
+import requests
+import os
 from tqdm import tqdm
 
 from core_app.generate_token import generate_token
@@ -7,20 +8,30 @@ DOWNLOAD_DIRECTORY = "./Recordings"
 base_url = "https://api.zoom.us/v2"
 
 
+def get_meeting_attendance(meeting_id):
+    url = base_url + "/meetings/" + meeting_id + "/participants"
+    response = requests.get(
+        url, headers={'Authorization': 'Bearer ' + generate_token()}).json()
+    return response.get('participants')
+
 
 def get_meeting_recording(meeting_id):
     url = base_url + "/meetings/" + meeting_id + "/recordings"
-    
-    response = requests.get(url, headers={'Authorization': 'Bearer ' + generate_token()}).json()
-    file_download_link = [recording['download_url'] for recording in response.get('recording_files') if recording['file_type']=="MP4"]
+
+    response = requests.get(
+        url, headers={'Authorization': 'Bearer ' + generate_token()}).json()
+    file_download_link = [recording['download_url'] for recording in response.get(
+        'recording_files') if recording['file_type'] == "MP4"]
     print(file_download_link)
     return file_download_link
+
 
 def download_recording(download_url, filename):
     dl_dir = os.sep.join([DOWNLOAD_DIRECTORY])
     full_filename = os.sep.join([dl_dir, filename])
     os.makedirs(dl_dir, exist_ok=True)
-    response = requests.get(download_url+ "?access_token=" + generate_token(), stream=True)
+    response = requests.get(
+        download_url + "?access_token=" + generate_token(), stream=True)
 
     # total size in bytes.
     total_size = int(response.headers.get('content-length', 0))
@@ -40,9 +51,11 @@ def download_recording(download_url, filename):
         # if there was some exception, print the error and return False
         print(e)
         return False
+
+
 try:
     download_link = get_meeting_recording("86878134309").pop()
-    print (download_link)
-    download_recording(download_link,"Test_Download_latest_86119440918.MP4")
+    print(download_link)
+    download_recording(download_link, "Test_Download_latest_86119440918.MP4")
 except Exception as e:
     print(e)

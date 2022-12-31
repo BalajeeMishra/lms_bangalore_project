@@ -17,7 +17,7 @@ const EditCouponCode = ({ codeData }) => {
     { value: false, name: "Disabled" }
   ];
 
-  async function findData() {}
+  async function findData() { }
 
   // useEffect(() => {
   //   console.log(validTo.slice(0, validTo.length - 4));
@@ -40,8 +40,9 @@ const EditCouponCode = ({ codeData }) => {
       toast.success("Coupon Code edited successfully");
       router.push("/admin-dashboard");
     }
-    if (response.status != 202) {
-      return toast.error("something went wrong!!Please try again");
+    else {
+      let k = Object.keys(response.data)[0]
+      return toast.error(response.data[k][0]);
     }
   };
 
@@ -131,7 +132,7 @@ const EditCouponCode = ({ codeData }) => {
                           onChange={() => {
                             setActive(true);
                           }}
-                          // value={this.state.isActiveOrNot[0].value}
+                        // value={this.state.isActiveOrNot[0].value}
                         />{" "}
                         {isActiveOrNot[0].name}
                       </div>
@@ -145,7 +146,7 @@ const EditCouponCode = ({ codeData }) => {
                           onChange={() => {
                             setActive(false);
                           }}
-                          // value={this.state.isActiveOrNot[1].value}
+                        // value={this.state.isActiveOrNot[1].value}
                         />{" "}
                         {isActiveOrNot[1].name}
                       </div>
