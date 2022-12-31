@@ -20,9 +20,14 @@ class CouponSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "Coupon code is shorter than 6 letters")
 
+        # Verify that discount is between 0 and 100
+        if 'discount' in data and (0 > data['discount'] or data['discount'] > 100):
+            raise serializers.ValidationError(
+                "Discount should be between 0 and 100")
+
         # Verify if the expiration date is set that it's in the future.
         if 'valid_to' in data and 'valid_from' in data:
-            if data['valid_to'] < now() and data['valid_from'] > data['valid_to']:
+            if data['valid_to'] < now() or data['valid_from'] > data['valid_to']:
                 raise serializers.ValidationError(
                     "Expiration date set in the past.")
 
