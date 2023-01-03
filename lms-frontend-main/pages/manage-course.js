@@ -70,6 +70,7 @@ function AddCourseDetails(props) {
     target_audience: "",
     time_commitment: "",
     instructor_name: "",
+    teacher: "",
     instructor_designation: "",
     instructorImage: "",
     instructor_image: "",
@@ -85,6 +86,8 @@ function AddCourseDetails(props) {
   });
   const [pointsList, setPointsList] = useState({});
 
+  //new useeffect.
+
   useEffect(() => {
     // Your code here
     FacultyService.getCourseCateogery().then((res) => {
@@ -94,6 +97,7 @@ function AddCourseDetails(props) {
     });
     AdminService.getTeachers().then((res) => {
       if (res?.status === 200) {
+        console.log(res.data.data, "res.data.data balajee");
         setTeachers(res.data.data);
       }
     });
@@ -545,6 +549,7 @@ function AddCourseDetails(props) {
                 >
                   Add Module
                 </Button>
+
                 {moduleContent.map((element, index) => {
                   return (
                     <Badge
@@ -567,9 +572,27 @@ function AddCourseDetails(props) {
                 Instructor Name
               </Form.Label>
               <Col sm="5">
-                <Form.Control type="text" name="instructor_name" placeholder="Instructor Name" onChange={(e) => handleFormBuilder(e)} />
+                <Form.Control required as="select" name="teacher" onChange={(e) => handleFormBuilder(e)}>
+                  <option value="">Select Teacher</option>
+                  {teachers.length > 0 &&
+                    teachers.map((e) => {
+                      return (
+                        <option key={e.id} value={e.id}>
+                          {e.user.first_name} {e.user.last_name}
+                        </option>
+                      );
+                    })}
+                </Form.Control>
               </Col>
             </Form.Group>
+
+            {/* <Form.Group as={Row} controlId="formPlaintextinst">
+              <Form.Label column sm="2"></Form.Label>
+              <Col sm="5">
+                <Form.Control type="text" name="instructor_name" placeholder="Instructor Name" onChange={(e) => handleFormBuilder(e)} />
+              </Col>
+            </Form.Group> */}
+
             <Form.Group as={Row} controlId="formPlaintextinst">
               <Form.Label column sm="2">
                 Instructor Designation
