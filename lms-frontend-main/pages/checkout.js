@@ -58,9 +58,11 @@ const Checkout = () => {
   useEffect(() => {
     getCartInfo();
   }, []);
+
   useEffect(() => {
+    console.log("hey balajee do ittt");
     if (router?.query?.app_code || router?.query?.code) {
-      console.log("router?.query?.code", router?.query?.code);
+      console.log("balajee mishra okay lets do it", router?.query?.code);
       setModalText({
         heading: "Payment",
         context: "Validating the data"
@@ -70,6 +72,7 @@ const Checkout = () => {
     } else {
     }
   }, [router.query]);
+
   useEffect(() => {
     if (cartList) {
       let temp_total = 0;
@@ -137,7 +140,7 @@ const Checkout = () => {
     CartService.checkout(checkout)
       .then((res) => {
         if (res && res.status === 200) {
-          console.log(res.data.payment_url);
+          console.log(res.data.payment_url, "balajee mishraa okay lets start with it.");
           setTimeout(() => {
             // window.open(res.data.payment_url,"_target")
             window.location.href = res.data.payment_url;
