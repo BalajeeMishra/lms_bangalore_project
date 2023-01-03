@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -503,10 +503,11 @@ class EnrollStudent(APIView):
 class StudentList(APIView):
     # permission_classes = [IsAuthenticated]
     def get(self, request):
-        student_list = Student.objects.filter(user__is_staff=False, enrolled_student__teacher__id=request.user.id).values('user__id', 'user__username',
-                                                                                                                          'user__first_name',
-                                                                                                                          'user__last_name',
-                                                                                                                          'interested_categories')
+        teacher = get_object_or_404(Teacher, user_id=request.user.id)
+        student_list = Student.objects.filter(user__is_staff=False, enrolled_student_id__teacher__id=teacher.id).values('user__id', 'user__username',
+                                                                                                                        'user__first_name',
+                                                                                                                        'user__last_name',
+                                                                                                                        'interested_categories')
         student_list_ = [k for k in student_list]
         return Response({"data": student_list_}, status=200)
 

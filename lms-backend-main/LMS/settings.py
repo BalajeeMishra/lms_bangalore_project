@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'products',
     'purchase',
     'coupons'
-    
+
 ]
 
 #  "django-filters"
@@ -252,8 +252,8 @@ ENV = "Prod"
 CC_AVENUE_WORKING_KEY = "7500363381B503AE4D6BF9689EF219EC"
 CC_AVENUE_MERCHANT_ID = "9002"
 CC_AVENUE_ACCESS_CODE = "AVHV68DL41BQ21VHQB"
-CC_AVENUE_REDIRECT_URL = "http://localhost/checkout"
-CC_AVENUE_CANCEL_URL = "http://localhost/checkout"
+CC_AVENUE_REDIRECT_URL = "http://localhost:3000/checkout"
+CC_AVENUE_CANCEL_URL = "http://localhost:3000/checkout"
 
 TEXT_DECODE_SECRET_KEY = 'rHPbPJBI8ZeTGBZqrhX8yDDiFrAom9aTDui1omgX7hg='
 
