@@ -99,7 +99,11 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'lms_prod',
         'USER': 'postgres',
+<<<<<<< HEAD
         'PASSWORD': 'Balajee123',
+=======
+        'PASSWORD': 'abc123',
+>>>>>>> cc84281e623b7f10ce72a9fc7e36b0b36906d084
         # 'PASSWORD': 'CaprA4rEgEbRUtrIxAch',
         # 'HOST': '3.111.73.127',
         'HOST': 'localhost',
