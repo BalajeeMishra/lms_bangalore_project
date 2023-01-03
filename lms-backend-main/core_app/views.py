@@ -1024,7 +1024,7 @@ class StudentCourseMaterialList(APIView):
     def get(self, request):
         try:
             course_material = CourseMaterial.objects.filter(
-                course__in=Course.objects.filter(is_deleted=False, id__in=StudentCourse.objects.filter(student=request.user.id)))
+                course__in=list(Course.objects.filter(is_deleted=False, id__in=list(StudentCourse.objects.filter(student=request.user.id).values_list("course", flat=True))).values_list("id", flat=True)))
 
             unique_course = dict()
             for material in course_material:
