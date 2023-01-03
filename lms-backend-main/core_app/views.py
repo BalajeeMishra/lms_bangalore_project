@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -25,7 +25,7 @@ from django.core.files.storage import FileSystemStorage
 import os
 from django.db.models import F
 from core_app.aws_interface import *
-from core_app.recordings import download_recording, get_meeting_recording
+from core_app.recordings import download_recording, get_meeting_recording, get_meeting_attendance
 from core_app.zoom_interface import get_video_by_id
 import tempfile
 import mimetypes
@@ -503,10 +503,11 @@ class EnrollStudent(APIView):
 class StudentList(APIView):
     # permission_classes = [IsAuthenticated]
     def get(self, request):
-        student_list = Student.objects.filter(user__is_staff=False).values('user__id', 'user__username',
-                                                                           'user__first_name',
-                                                                           'user__last_name',
-                                                                           'interested_categories')
+        teacher = get_object_or_404(Teacher, user_id=request.user.id)
+        student_list = Student.objects.filter(user__is_staff=False, enrolled_student_id__teacher__id=teacher.id).values('user__id', 'user__username',
+                                                                                                                        'user__first_name',
+                                                                                                                        'user__last_name',
+                                                                                                                        'interested_categories')
         student_list_ = [k for k in student_list]
         return Response({"data": student_list_}, status=200)
 
@@ -1024,7 +1025,7 @@ class StudentCourseMaterialList(APIView):
     def get(self, request):
         try:
             course_material = CourseMaterial.objects.filter(
-                course__in=Course.objects.filter(is_deleted=False, id__in=StudentCourse.objects.filter(student=request.user.id)))
+                course__in=list(Course.objects.filter(is_deleted=False, id__in=list(StudentCourse.objects.filter(student=request.user.id).values_list("course", flat=True))).values_list("id", flat=True)))
 
             unique_course = dict()
             for material in course_material:
@@ -1189,7 +1190,7 @@ class CourseEnquire(APIView):
         return Response({"message": "Success"}, status=200)
 
 
-class MeetingAttendanve(APIView):
+class MeetingAttendance(APIView):
     def get(self, request, meeting_id):
         meeting_id = meeting_id.strip()
         res = get_meeting_attendance(meeting_id)

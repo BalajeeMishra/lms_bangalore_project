@@ -48,9 +48,10 @@ INSTALLED_APPS = [
     'authentication',
     'products',
     'purchase',
-    'coupons',
+    'coupons'
 
 ]
+
 #  "django-filters"
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -98,7 +99,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'lms_prod',
         'USER': 'postgres',
-        'PASSWORD': 'Balajee123',
+        'PASSWORD': 'abc123',
         # 'PASSWORD': 'CaprA4rEgEbRUtrIxAch',
         # 'HOST': '3.111.73.127',
         'HOST': 'localhost',
@@ -251,8 +252,8 @@ ENV = "Prod"
 CC_AVENUE_WORKING_KEY = "7500363381B503AE4D6BF9689EF219EC"
 CC_AVENUE_MERCHANT_ID = "9002"
 CC_AVENUE_ACCESS_CODE = "AVHV68DL41BQ21VHQB"
-CC_AVENUE_REDIRECT_URL = "http://localhost/checkout"
-CC_AVENUE_CANCEL_URL = "http://localhost/checkout"
+CC_AVENUE_REDIRECT_URL = "http://localhost:3000/checkout"
+CC_AVENUE_CANCEL_URL = "http://localhost:3000/checkout"
 
 TEXT_DECODE_SECRET_KEY = 'rHPbPJBI8ZeTGBZqrhX8yDDiFrAom9aTDui1omgX7hg='
 
