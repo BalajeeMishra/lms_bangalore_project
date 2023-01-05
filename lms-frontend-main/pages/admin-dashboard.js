@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import AddCourseDetails from "./manage-course";
+import EditCourseDetails from "./edit-course";
 import AdminService from "./api/admin.service";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
@@ -23,6 +24,13 @@ function AdminDashBoard(props) {
   const router = useRouter();
   const [courses, setCourses] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editCourse, setEditCourse] = useState(null);
+  const [updated, setUpdated] = useState(false)
+
+  function handleEditClose() {
+    setShowEditModal(false);
+  }
   function handleClose() {
     setShowModal(false);
   }
@@ -40,7 +48,7 @@ function AdminDashBoard(props) {
         setCourses(res.data.data);
       }
     });
-  }, []);
+  }, [updated]);
 
   const TabSideBar = ({ itemList, label }) => {
     return (
@@ -141,12 +149,17 @@ function AdminDashBoard(props) {
                   <div className="cardView m-0">
                     <h5 onClick={() => redirectToTemplate(course.id)}>{course.title}</h5>
                     <ul className="coach-footer">
+                      <li className="cursorPointer" onClick={() => { setShowEditModal(true); setUpdated(false); setEditCourse(course) }}>
+                        <i className="fa fa-pen" />
+                        <span>Edit Course</span>
+                      </li>
                       <li className="cursorPointer" onClick={() => deleteCourseDetail(course.id)}>
                         <i className="far fa-trash-alt" />
                         <span>Delete Course</span>
                       </li>
                     </ul>
                   </div>
+                  {showEditModal && <EditCourseModal clName="admindash" xl setShowEditModal={setShowEditModal} showEditModal={showEditModal} header={"Edit Course Details"} />}
                 </div>
               </div>
             );
@@ -157,6 +170,11 @@ function AdminDashBoard(props) {
   function done(item) {
     toast.success("Success: Course Details added");
     setCourses((prev) => [...prev, item]);
+  }
+
+  function edone(item) {
+    toast.success("Success: Course Details updated");
+    setUpdated(true)
   }
 
   function CourseModal(props) {
@@ -170,6 +188,26 @@ function AdminDashBoard(props) {
           {!props.hideClose && (
             <Modal.Footer>
               <Button variant="secondary" onClick={handleClose}>
+                Close
+              </Button>
+            </Modal.Footer>
+          )}
+        </Modal>
+      </>
+    );
+  }
+
+  function EditCourseModal(props) {
+    return (
+      <>
+        <Modal show={props.showEditModal} onHide={handleEditClose} dialogClassName={props.xl ? "modal-xl" : ""} className="vidModal admindash">
+          <Modal.Header closeButton>{props.header}</Modal.Header>
+          <Modal.Body>
+            <EditCourseDetails setShowModal={props.setShowEditModal} cb={edone} course={editCourse} />
+          </Modal.Body>
+          {!props.hideClose && (
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleEditClose}>
                 Close
               </Button>
             </Modal.Footer>

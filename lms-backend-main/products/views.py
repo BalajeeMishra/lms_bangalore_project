@@ -30,6 +30,14 @@ class GetCourseDetails(APIView):
                 return Response({"message": "Invalid category"}, status=400)
 
 
+def isfloat(num):
+    try:
+        float(num)
+        return True
+    except ValueError:
+        return False
+
+
 class AddCourseDetails(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -71,13 +79,23 @@ class AddCourseDetails(APIView):
                 course, data=request.data, partial=True)
             if course_serialzer.is_valid():
                 course_serialzer.save()
-                course_details_serializer = CourseDetailsCreate(
-                    course_detail, data=request.data, partial=True)
-                if course_details_serializer.is_valid():
-                    course_details_serializer.save()
-                    return Response({"message": "Course Detail Updated", "data": course_details_serializer.data}, status=200)
+                price = CoursePrice.objects.get(
+                    id=request.data['price']['id'], is_deleted=False)
+                price_serializer = CoursePricingGet(
+                    price, data=request.data['price'], partial=True)
+                if price_serializer.is_valid():
+                    pricing_data = price_serializer.save()
+                    request.data['price'] = pricing_data.id
+                    course_details_serializer = CourseDetailsCreate(
+                        course_detail, data=request.data, partial=True)
+                    if course_details_serializer.is_valid():
+                        course_details_serializer.save()
+                        return Response({"message": "Course Detail Updated", "data": course_details_serializer.data}, status=200)
+                    else:
+                        return Response({"message": "Invalid Data", "errors": course_details_serializer.errors}, status=400)
                 else:
-                    return Response({"message": "Invalid Data", "errors": course_details_serializer.errors}, status=400)
+                    return Response({"message": "Invalid Pricing Data", "errors": price_serializer.errors}, status=400)
+
             else:
                 return Response({"message": "Invalid Data", "errors": course_serialzer.errors}, status=400)
 

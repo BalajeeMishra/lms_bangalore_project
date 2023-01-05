@@ -13,6 +13,19 @@ const addCourse = (courseData) => {
     });
 };
 
+const editCourse = (courseData) => {
+  return api
+    .put(`/course_detail/${courseData['id']}`, {
+      ...courseData
+    })
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      return error.response;
+    });
+};
+
 const uploadAssets = (data) => {
   console.log("data", data);
   let path = "/assets";
@@ -76,6 +89,7 @@ const deleteCourseDetails = (category_id) => {
 
 const AdminService = {
   addCourse,
+  editCourse,
   uploadAssets,
   listCourseDetails,
   getCourseDetails,
