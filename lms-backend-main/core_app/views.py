@@ -1050,7 +1050,6 @@ class StudentCourseMaterialList(APIView):
             return Response({"message": "Assignment Material list is empty "}, status=204)
 
 
-@api_view(("POST"))
 # @renderer_classes((TemplateHTMLRenderer, JSONRenderer))
 def store_recording(request):
     if request.method == 'POST':
@@ -1073,6 +1072,18 @@ def store_recording(request):
         else:
             return Response({"message": "Recording could not be uploaded to aws storage"}, status=400)
 
+
+@api_view(['POST',])
+def store_recording_video(request):
+    print(request.data)
+    print(request.FILES, "AaaaaaaaaaaaaaaaaaaaaaA")
+    files = request.FILES['file']
+    file_name = f"./Videos/{files.name}"
+    upload_status = upload_to_s3(files, file_name)
+    if upload_status:
+        return Response({"message": "File successfully saved"}, status=status.HTTP_202_ACCEPTED)
+    else:
+        return Response({"message": "error"}, status=status.HTTP_400_BAD_REQUEST)
 
 # def store_recording(request):
 #     if request.method == 'POST':

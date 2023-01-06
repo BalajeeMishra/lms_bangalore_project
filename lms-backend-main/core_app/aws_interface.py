@@ -1,13 +1,14 @@
 import codecs
 import boto3
 import os
-from botocore.exceptions import ClientError
+from botocore.exceptions import ClientError, NoCredentialsError
 from django.conf import settings
 
 
 ACCESS_KEY = settings.AWS_KEY
 SECRET_KEY = settings.AWS_SEC
-AWS_BUCKET=settings.BUCKET_NAME
+AWS_BUCKET = settings.BUCKET_NAME
+
 
 def upload_file_to_storage(file_path, bucket_name=AWS_BUCKET):
     try:
@@ -47,10 +48,10 @@ def upload_assessment_file(file, path, bucket_name=AWS_BUCKET):
     # Upload the file
     s3 = boto3.client('s3', aws_access_key_id=ACCESS_KEY,
                       aws_secret_access_key=SECRET_KEY)
-    if settings.ENV=="Dev":
-        path="Dev/"+path
+    if settings.ENV == "Dev":
+        path = "Dev/"+path
     else:
-        path=path
+        path = path
     try:
         response = s3.upload_fileobj(
             file, bucket_name, path)
@@ -64,34 +65,35 @@ def get_assessment_files(path, course_id=None, bucket_name=AWS_BUCKET):
     # List of file
     s3 = boto3.client('s3', aws_access_key_id=ACCESS_KEY,
                       aws_secret_access_key=SECRET_KEY)
-    if settings.ENV=="Dev":
-        prefix="Dev/"+path
+    if settings.ENV == "Dev":
+        prefix = "Dev/"+path
     else:
-        prefix=path
+        prefix = path
     try:
-        if course_id is not None: 
-            prefix=prefix+str(course_id)+"/"
+        if course_id is not None:
+            prefix = prefix+str(course_id)+"/"
         get_all = s3.list_objects(Bucket=bucket_name, Prefix=prefix)
         list = []
         if get_all.get('Contents') is not None:
             for o in get_all.get('Contents'):
-              
-                if o['Size']>0:
+
+                if o['Size'] > 0:
                     temp = o['Key'].replace(path, "").split("/")
                     obj = {
                         "Key": o['Key'],
-                        "course_id":temp[1] if settings.ENV=="Dev"else temp[0],
-                        "file_name": temp[2] if settings.ENV=="Dev"else temp[1]}
+                        "course_id": temp[1] if settings.ENV == "Dev"else temp[0],
+                        "file_name": temp[2] if settings.ENV == "Dev"else temp[1]}
                     list.append(obj)
         return list
     except ClientError as e:
         print("Error", e)
         return []
 
+
 def download_assessment_file(path, bucket_name=AWS_BUCKET):
     s3 = boto3.client('s3', aws_access_key_id=ACCESS_KEY,
                       aws_secret_access_key=SECRET_KEY)
-  
+
     try:
         # response = s3.download_file(Bucket=bucket_name, Key=path)
         # data = TextIOWrapper(StreamingBodyIO(response))
@@ -103,11 +105,26 @@ def download_assessment_file(path, bucket_name=AWS_BUCKET):
 
         # with open('FILE_NAME', 'wb') as f:
         #     print(s3.download_fileobj(bucket_name, path, f))
-        response=s3.get_object(Bucket=bucket_name, Key=path)
+        response = s3.get_object(Bucket=bucket_name, Key=path)
         return response
         # print(response)
         # contents = response['Body'].read()
         # print(contents.decode("utf-8"))
     except ClientError as e:
         print("Error", e)
+        return False
+
+
+def upload_to_s3(local_file, s3_file, bucket=AWS_BUCKET):
+    s3 = boto3.client('s3', aws_access_key_id=ACCESS_KEY,
+                      aws_secret_access_key=SECRET_KEY)
+    try:
+        s3.upload_fileobj(local_file, bucket, s3_file)
+        print("Upload Successful")
+        return True
+    except FileNotFoundError:
+        print("The file was not found")
+        return False
+    except NoCredentialsError:
+        print("Credentials not available")
         return False

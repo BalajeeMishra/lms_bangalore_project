@@ -60,6 +60,8 @@ urlpatterns = [
          ZoomMeeting.as_view(), name="zoom_meeting_get_by_id"),
 
     path('store_recording123/', csrf_exempt(store_recording), name="store_recording"),
+    path('store_recording_video', store_recording_video,
+         name="store_recording_video"),
     path('fetch_recording/', fetch_recording, name="fetch_recording"),
     path("play_recording", play_recording, name="play_recording"),
 
