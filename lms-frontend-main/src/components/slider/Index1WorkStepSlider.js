@@ -27,10 +27,10 @@ export default class Index1WorkStepSlider extends Component {
         {
           breakpoint: 767,
           settings: {
-            slidesToShow: 1,
-          },
-        },
-      ],
+            slidesToShow: 1
+          }
+        }
+      ]
     };
     return (
       <Fragment>
@@ -52,32 +52,29 @@ export default class Index1WorkStepSlider extends Component {
             </div>
           </div>
         </div>
-        <Slider
-          {...Index1WorkStepSliderprops}
-          ref={(c) => (this.slider = c)}
-          className="work-step-wrap wow fadeInUp delay-0-4s"
-        >
+        <Slider {...Index1WorkStepSliderprops} ref={(c) => (this.slider = c)} className="work-step-wrap wow fadeInUp delay-0-4s">
           <div className="work-step-item">
             <span className="number">01</span>
             <div className="content">
               <h4>Select a course</h4>
-              <p>Explore our course catalogue and pick a course that fits your need.
-              </p>
+              <p>Explore our course catalogue and pick a course that fits your need.</p>
             </div>
           </div>
           <div className="work-step-item">
             <span className="number">02</span>
             <div className="content">
               <h4>Enroll in the course</h4>
-              <p>You can access any course by purchasing it using our secure payment
-gateway.</p>
+              <p>You can access any course by purchasing it using our secure payment gateway.</p>
             </div>
           </div>
           <div className="work-step-item">
             <span className="number">03</span>
             <div className="content">
               <h4>Start Learning</h4>
-              <p>Gain actionable skills and insights to advance your <br/>career.</p>
+              <p>
+                Gain actionable skills and insights to advance your <br />
+                career.
+              </p>
             </div>
           </div>
         </Slider>

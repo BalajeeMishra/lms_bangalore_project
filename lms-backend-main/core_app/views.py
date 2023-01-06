@@ -34,6 +34,10 @@ from django.http.response import HttpResponse
 from django.utils.timezone import now
 
 
+from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
+
+
 # https://github.com/JoeyAlpha5/django-zoom-meetings
 
 API_KEY = settings.API_KEY
@@ -1046,20 +1050,44 @@ class StudentCourseMaterialList(APIView):
             return Response({"message": "Assignment Material list is empty "}, status=204)
 
 
+@api_view(("POST"))
+# @renderer_classes((TemplateHTMLRenderer, JSONRenderer))
 def store_recording(request):
     if request.method == 'POST':
-        file_download_link = get_meeting_recording(request.data['meeting_id'])
-        module = request.data['module']
+        # file_download_link = get_meeting_recording(request.data['meeting_id'])
+        # module = request.data['module'
+        # ]
+        print(request.FILES, "request seeeeee")
+        files = request.FILES["data"]
+        print(files, "aalokkkkk")
+        # file_name = datetime.today().strftime('%d_%b_%Y_%H_%M')
+        file_name = "balajee_aalok_123"
+        # download_recording(file_download_link,
+        #                    "./Recordings/{}.MP4".format(file_name))
+        upload_status = upload_assessment_file(files,
+                                               "./Recordings/{}.MP4".format(file_name))
 
-        file_name = datetime.today().strftime('%d_%b_%Y_%H_%M')
-        download_recording(file_download_link,
-                           "./Recordings/{}.MP4".format(file_name))
-        upload_status = upload_file_to_storage(
-            "./Recordings/{}.MP4".format(file_name), folder_name=module)
+        print(upload_status, "upload_status by us")
         if upload_status:
             return Response({"message": "Recording successfully uploaded to aws storage"}, status=200)
         else:
             return Response({"message": "Recording could not be uploaded to aws storage"}, status=400)
+
+
+# def store_recording(request):
+#     if request.method == 'POST':
+#         file_download_link = get_meeting_recording(request.data['meeting_id'])
+#         module = request.data['module']
+
+#         file_name = datetime.today().strftime('%d_%b_%Y_%H_%M')
+#         download_recording(file_download_link,
+#                            "./Recordings/{}.MP4".format(file_name))
+#         upload_status = upload_file_to_storage(
+#             "./Recordings/{}.MP4".format(file_name), folder_name=module)
+#         if upload_status:
+#             return Response({"message": "Recording successfully uploaded to aws storage"}, status=200)
+#         else:
+#             return Response({"message": "Recording could not be uploaded to aws storage"}, status=400)
 
 
 def fetch_recording(request):

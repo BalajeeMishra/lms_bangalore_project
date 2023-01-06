@@ -31,9 +31,9 @@ class CourseAdminView(admin.ModelAdmin):
     list_display = ('id', 'category', 'teacher', 'title', 'description')
 
 
-admin.site.site_header  =  "LMS"  
-admin.site.site_title  =  "Admin Console"
-admin.site.index_title  =  "LMS Admin Console"
+admin.site.site_header = "LMS"
+admin.site.site_title = "Admin Console"
+admin.site.index_title = "LMS Admin Console"
 
 # admin.site.unregister(User)
 # admin.site.register(Teacher,  TeacherAdminView)

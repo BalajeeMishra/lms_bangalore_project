@@ -4,31 +4,28 @@ import Layout from "../src/layout/Layout";
 import dynamic from "next/dynamic";
 // import Slider from "react-slick";
 import Index1WorkStepSlider from "../src/components/slider/Index1WorkStepSlider";
+import TestimonialsSlider from "../src/components/slider/testimonialsSlider";
 import { useEffect } from "react";
 // import { index1EventWrap, index1Testimonial } from "../src/sliderProps";
 
-const Index1Isotope = dynamic(
-  () => import("../src/components/isotope/Index1Isotope"),
-  {
-    ssr: false,
-  }
-);
+const Index1Isotope = dynamic(() => import("../src/components/isotope/Index1Isotope"), {
+  ssr: false
+});
 
-function Index(){
-
-  useEffect(()=>{
-    let userAccessToken = localStorage.getItem('user')
-    if(userAccessToken){
+function Index() {
+  useEffect(() => {
+    let userAccessToken = localStorage.getItem("user");
+    if (userAccessToken) {
       let tokenObj = JSON.parse(userAccessToken);
-      if(tokenObj && tokenObj.access){
-        const decode = JSON.parse(atob(tokenObj.access.split('.')[1]));
-        let exp = decode && decode.exp 
+      if (tokenObj && tokenObj.access) {
+        const decode = JSON.parse(atob(tokenObj.access.split(".")[1]));
+        let exp = decode && decode.exp;
         if (Date.now() > exp * 1000) {
-          localStorage.removeItem('user')
+          localStorage.removeItem("user");
         }
       }
     }
-  },[])
+  }, []);
   return (
     <Layout footer={1}>
       <section className="hero-section rel z-1 pt-150 rpt-135 pb-75 rpb-100">
@@ -39,9 +36,12 @@ function Index(){
                 {/* <span className="sub-title style-two mb-20 wow fadeInUp delay-0-2s">
                   Coaching &amp; Speker
                 </span> */}
-                <h1 className="mb-20 wow fadeInUp delay-0-4s" style={{textTransform: 'none'}}>Learn to Leverage Evidence for Decisions</h1>
+                <h1 className="mb-20 wow fadeInUp delay-0-4s" style={{ textTransform: "none" }}>
+                  Learn to Leverage Evidence for Decisions
+                </h1>
                 <p className="wow fadeInUp delay-0-6s">
-                A global knowledge exchange for empowering learners with skills <br/>in data-driven decision making
+                  A global knowledge exchange for empowering learners with skills <br />
+                  in data-driven decision making
                 </p>
                 {/* <div className="hero-btn mt-30 wow fadeInUp delay-0-8s">
                   <Link href="/course-grid">
@@ -73,8 +73,7 @@ function Index(){
                 </div>
                 <div className="content">
                   <h4>Online Courses from Experts</h4>
-                  <p>Designed by experts, our courses help you expand your skills and engage
-with a global network of learners.</p>
+                  <p>Designed by experts, our courses help you expand your skills and engage with a global network of learners.</p>
                 </div>
               </div>
             </div>
@@ -85,8 +84,7 @@ with a global network of learners.</p>
                 </div>
                 <div className="content">
                   <h4>Live Training Sessions</h4>
-                  <p>Our courses are led by seasoned industry experts who conduct live sessions
-and engage closely with learners.</p>
+                  <p>Our courses are led by seasoned industry experts who conduct live sessions and engage closely with learners.</p>
                 </div>
               </div>
             </div>
@@ -97,23 +95,14 @@ and engage closely with learners.</p>
                 </div>
                 <div className="content">
                   <h4>Case-based Learning</h4>
-                  <p>Immerse yourself in real-world learning and engage in application-based
-interactive sessions.</p>
+                  <p>Immerse yourself in real-world learning and engage in application-based interactive sessions.</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <img
-          className="rectangle-dots"
-          src="assets/images/shapes/rectangle-dots.png"
-          alt="Shape"
-        />
-        <img
-          className="circle-dots"
-          src="assets/images/shapes/circle-dots.png"
-          alt="Shape"
-        />
+        <img className="rectangle-dots" src="assets/images/shapes/rectangle-dots.png" alt="Shape" />
+        <img className="circle-dots" src="assets/images/shapes/circle-dots.png" alt="Shape" />
       </section>
       {/* Features Section End */}
       {/* About Section Start */}
@@ -129,13 +118,12 @@ interactive sessions.</p>
               <div className="about-content rel z-2 pb-115 rpb-85 wow fadeInRight delay-0-2s">
                 <div className="section-title mb-40">
                   {/* <span className="sub-title mb-25">about us</span> */}
-                  <h2>Monitoring, Evaluation, and Learning for
-Development Professionals</h2>
+                  <h2>Monitoring, Evaluation, and Learning for Development Professionals</h2>
                 </div>
                 <div className="about-features">
                   <div className="row">
                     <div className="col-sm-12">
-                      <div className="feature-item" style={{maxWidth: '100%'}}>
+                      <div className="feature-item" style={{ maxWidth: "100%" }}>
                         <div className="icon">
                           <i className="fas fa-check" />
                         </div>
@@ -237,11 +225,7 @@ Development Professionals</h2>
             </div>
             <div className="col-lg-5">
               <div className="why-choose-images mt-10 wow fadeInUp delay-0-4s">
-                <img
-                  src="assets/images/why-choose/section_3_image.png"
-                  alt="Circle"
-                  className="circle"
-                />
+                <img src="assets/images/why-choose/section_3_image.png" alt="Circle" className="circle" />
                 {/* <img
                   src="assets/images/why-choose/why-choose1.jpg"
                   alt="Why Choose"
@@ -263,7 +247,6 @@ Development Professionals</h2>
         </div>
       </section>
 
-
       {/* Work Process Section Start */}
       <section className="work-process-section bg-white rel z-1 pt-130 rpt-100 pb-100 rpb-70">
         <div className="container">
@@ -284,8 +267,9 @@ Development Professionals</h2>
                 >
                   <i className="fas fa-play" />
                 </a>*/}
-              </div> 
+              </div>
             </div>
+
             <div className="col-lg-6">
               <div className="newsletter-content bg-lighter">
                 <div className="section-title mb-20">
@@ -293,9 +277,9 @@ Development Professionals</h2>
                   <h2>Our vision</h2>
                 </div>
                 <p>
-                As an organization with almost two decades of experience in field building and nurturing outcomes-driven ecosystems, we are relentlessly pursuing our vision of empowering individuals and organizations with strategic and technical skills to help them make better data-driven decisions, improve public policy, and pursue powerful ideas.
+                  As an organization with almost two decades of experience in field building and nurturing outcomes-driven ecosystems, we are relentlessly pursuing our vision of empowering individuals and organizations with strategic and technical
+                  skills to help them make better data-driven decisions, improve public policy, and pursue powerful ideas.
                 </p>
-                
               </div>
             </div>
           </div>
@@ -327,8 +311,12 @@ Development Professionals</h2>
         </div>
       </section>
 
-      
+      <section className="work-process-section bg-white rel z-1 pt-130 rpt-100 pb-100 rpb-70">
+        <div className="container">
+          <TestimonialsSlider />
+        </div>
+      </section>
     </Layout>
   );
-};
+}
 export default Index;

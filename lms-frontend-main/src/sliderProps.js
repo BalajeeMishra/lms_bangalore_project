@@ -10,10 +10,10 @@ export const Index1WorkStepSliderprops = {
     {
       breakpoint: 767,
       settings: {
-        slidesToShow: 1,
-      },
-    },
-  ],
+        slidesToShow: 1
+      }
+    }
+  ]
 };
 
 export const index1EventWrap = {
@@ -29,16 +29,16 @@ export const index1EventWrap = {
     {
       breakpoint: 991,
       settings: {
-        slidesToShow: 2,
-      },
+        slidesToShow: 2
+      }
     },
     {
       breakpoint: 575,
       settings: {
-        slidesToShow: 1,
-      },
-    },
-  ],
+        slidesToShow: 1
+      }
+    }
+  ]
 };
 
 export const index1Testimonial = {
@@ -50,7 +50,7 @@ export const index1Testimonial = {
   autoplaySpeed: 5000,
   pauseOnHover: false,
   slidesToScroll: 1,
-  slidesToShow: 1,
+  slidesToShow: 1
 };
 
 export const index2Course = {
@@ -66,16 +66,16 @@ export const index2Course = {
     {
       breakpoint: 1199,
       settings: {
-        slidesToShow: 2,
-      },
+        slidesToShow: 2
+      }
     },
     {
       breakpoint: 767,
       settings: {
-        slidesToShow: 1,
-      },
-    },
-  ],
+        slidesToShow: 1
+      }
+    }
+  ]
 };
 export const testimonialtwoSlider = {
   infinite: true,
@@ -86,7 +86,7 @@ export const testimonialtwoSlider = {
   autoplaySpeed: 5000,
   pauseOnHover: false,
   slidesToScroll: 1,
-  slidesToShow: 1,
+  slidesToShow: 1
 };
 
 export const coachSlider = {
@@ -102,18 +102,19 @@ export const coachSlider = {
     {
       breakpoint: 1199,
       settings: {
-        slidesToShow: 2,
-      },
+        slidesToShow: 2
+      }
     },
     {
       breakpoint: 767,
       settings: {
-        slidesToShow: 1,
-      },
-    },
-  ],
+        slidesToShow: 1
+      }
+    }
+  ]
 };
-export const testimonialthree = {
+
+export const testimonialProps = {
   infinite: true,
   arrows: false,
   dots: true,
@@ -122,5 +123,5 @@ export const testimonialthree = {
   autoplaySpeed: 5000,
   pauseOnHover: false,
   slidesToScroll: 1,
-  slidesToShow: 1,
+  slidesToShow: 1
 };
