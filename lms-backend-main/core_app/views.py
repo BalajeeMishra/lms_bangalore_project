@@ -1050,6 +1050,7 @@ class StudentCourseMaterialList(APIView):
             return Response({"message": "Assignment Material list is empty "}, status=204)
 
 
+# @api_view(["POST"])
 # @renderer_classes((TemplateHTMLRenderer, JSONRenderer))
 def store_recording(request):
     if request.method == 'POST':

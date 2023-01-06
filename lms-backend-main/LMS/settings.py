@@ -229,22 +229,22 @@ EMAIL_HOST_USER = "lmsaiml24@gmail.com"
 EMAIL_HOST_PASSWORD = 'shpvznmaptwyryzl'
 ENCRYPTION_KEY = "K125jgktQC-7Algihk0xO9MbrshfUx2-PTE-ztjHJIg="
 
-
+# production
 # AWS_KEY = "AKIAZCLTTESHN4SB4G4W"
 # AWS_SEC = "AQJRlgxbSDVbY4/8Vd1VXkvhgRC3/5iGug04A6YF"
 
 AWS_KEY = "AKIAW4HSXEZSTQJEE5EQ"
 AWS_SEC = "dG2OUzLgVrTMN8cgiG+tziP/nvSsMALE7xdEWyb7"
-# AWS_KEY="AKIAW4HSXEZSULA24FWL"
-# AWS_SEC="FZFTIAWHgO2qePQu3S6AlBmGUl9B9DDG+SU9KBEN"
+# AWS_KEY = "AKIAW4HSXEZSULA24FWL"
+# AWS_SEC = "FZFTIAWHgO2qePQu3S6AlBmGUl9B9DDG+SU9KBEN"
 
 
 # AWS_KEY="AKIAW4HSXEZSULA24FWL"
 # AWS_SEC="FZFTIAWHgO2qePQu3S6AlBmGUl9B9DDG+SU9KBEN"
-
+# prodution
 # BUCKET_NAME = "sambodhieducationnestss3"
-BUCKET_NAME = "lms-utilitie-bucket"
-S3_LINK = "https://lms-utilitie-bucket.s3.ap-south-1.amazonaws.com/"
+BUCKET_NAME = "lms-recordings"
+S3_LINK = "https://lms-recordings.s3.ap-south-1.amazonaws.com/"
 
 
 # HOST_URL = "http://lmsmle.educationnest.com"
