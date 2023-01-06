@@ -18,9 +18,8 @@ function CourseMaterials() {
     });
   }, []);
 
-  useEffect(() => {
-    console.log(materials, "balajee mishraaa");
-  }, [materials]);
+  useEffect(() => {}, [materials]);
+
   function splitIntoChunk(arr, chunk) {
     let allChunks = [];
     for (let i = 0; i < arr.length; i += chunk) {
