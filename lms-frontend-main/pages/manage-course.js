@@ -237,7 +237,7 @@ function AddCourseDetails(props) {
       cd.image_1 = data[0]?.key;
       cd.curriculum_link = data[1]?.key;
       cd.instructor_image = data[2]?.key;
-
+      console.log(cd)
       AdminService.addCourse(cd).then((res) => {
         if (res?.status === 200) {
           props.cb(res.data.data);
