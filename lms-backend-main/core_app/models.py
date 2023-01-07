@@ -34,6 +34,9 @@ class Course(models.Model):
     description = models.TextField()
     is_deleted = models.BooleanField(default=False)
 
+    def __str__(self) -> str:
+        return self.title
+
 
 class Module(models.Model):
     course = models.ForeignKey(
@@ -43,6 +46,9 @@ class Module(models.Model):
     is_deleted = models.BooleanField(default=False)
     teacher = models.ForeignKey(
         Teacher, blank=True, null=True, on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return self.title
 
 
 class CourseMaterial(models.Model):

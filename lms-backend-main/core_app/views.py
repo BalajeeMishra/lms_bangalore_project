@@ -397,17 +397,36 @@ class ModuleViewSet(ModelViewSet):
     serializer_class = ModuleSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self, request):
+    def get_queryset(self):
         """
-        Return all modules or modules of a particular course
+        Return all modules
         """
         qs = Module.objects.all()
-        if "course_id" in request.data:
-            qs = qs.filter(course__id=request.data['course_id'])
         return qs
 
-    def post(self, request):
-        pass
+    def list(self, request, *args, **kwargs):
+        """
+        Return list of all modules
+        """
+        teacher = get_object_or_404(Teacher, user_id=request.user.id)
+        qs = Module.objects.filter(teacher=teacher.id)
+        if "course_id" in request.data:
+            qs = qs.filter(course__id=request.data['course_id'])
+        serializer = ModuleSerializer(qs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def create(self, request, *args, **kwargs):
+        """
+        Create a new module
+        """
+        teacher = get_object_or_404(Teacher, user_id=request.user.id)
+        request.data['teacher'] = teacher.id
+        serializer = ModuleSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_417_EXPECTATION_FAILED)
 
 
 class AddCourseQuiz(APIView):
@@ -1046,10 +1065,14 @@ class StudentCourseMaterialList(APIView):
 
     def get(self, request):
         try:
-            stu = get_object_or_404(Student, user_id=request.user.id)
-            course_material = CourseMaterial.objects.filter(
-                course__in=list(Course.objects.filter(is_deleted=False, id__in=list(StudentCourse.objects.filter(student=stu.id).values_list("course", flat=True))).values_list("id", flat=True)))
-
+            try:
+                stu = get_object_or_404(Student, user_id=request.user.id)
+                course_material = CourseMaterial.objects.filter(
+                    course__in=list(Course.objects.filter(is_deleted=False, id__in=list(StudentCourse.objects.filter(student=stu.id).values_list("course", flat=True))).values_list("id", flat=True)))
+            except Exception:
+                teacher = get_object_or_404(Teacher, user_id=request.user.id)
+                course_material = CourseMaterial.objects.filter(course__in=list(
+                    Course.objects.filter(is_deleted=False, teacher__id=teacher.id)))
             unique_course = dict()
             for material in course_material:
                 url = material.material_url.split('/')
@@ -1132,17 +1155,15 @@ class VideoViewSet(ModelViewSet):
                 else:
                     vids[vid.course.id] += files_list
 
-            print(vids)
             files_list_ = [{"course_id": key, "file_list": value}
                            for key, value in vids.items()]
-            print(files_list_)
             return Response({"message": "success", "data": files_list_}, status=status.HTTP_200_OK)
         except Exception:
             return Response({"message": "failed to fetch"}, status=status.HTTP_409_CONFLICT)
 
     def create(self, request, **kwargs):
         """
-        Create a coupon
+        Create a video
         """
         course_id = request.data['course_id']
 

@@ -5,6 +5,7 @@ from rest_framework import routers
 
 router = routers.DefaultRouter(trailing_slash=False)
 router.register(r'video', VideoViewSet, basename='video')
+router.register('module',ModuleViewSet, basename="module")
 
 urlpatterns = [
     path('login', signin.as_view(), name='login'),

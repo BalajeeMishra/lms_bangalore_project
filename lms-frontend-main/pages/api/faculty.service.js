@@ -12,10 +12,33 @@ const addCourse = (courseData) => {
       return error.response;
     });
 };
+const addModule = (courseData) => {
+  return api
+    .post("/module",
+      courseData
+    )
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      return error.response;
+    });
+};
 
 const listCourse = () => {
   return api
     .get("/add_course")
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      return error.response;
+    });
+};
+
+const listModule = () => {
+  return api
+    .get("/module")
     .then((response) => {
       return response;
     })
@@ -36,10 +59,32 @@ const updateCourse = (courseData, id) => {
       return error.response;
     });
 };
+const updateModule = (moduleData, id) => {
+  return api
+    .put("/module/" + id,
+      moduleData
+    )
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      return error.response;
+    });
+};
 
 const deleteCourse = (id) => {
   return api
     .delete("/add_course/" + id)
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      return error.response;
+    });
+};
+const deleteModule = (id) => {
+  return api
+    .delete("/module/" + id)
     .then((response) => {
       return response;
     })
@@ -345,7 +390,11 @@ const FacultyService = {
   assignGrade,
   getTeachers,
   uploadVideo,
-  listVideo
+  listVideo,
+  addModule,
+  listModule,
+  updateModule,
+  deleteModule
 };
 
 export default FacultyService;
