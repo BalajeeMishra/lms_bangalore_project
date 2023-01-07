@@ -295,9 +295,8 @@ const getTeachers = () => {
 };
 
 const uploadVideo = (data) => {
-  console.log(data)
   return api
-    .post('/store_recording_video', data.form_data, {
+    .post("/store_recording_video", data.form_data, {
       headers: {
         "Content-Type": "multipart/form-data"
       }
@@ -308,7 +307,7 @@ const uploadVideo = (data) => {
     .catch((error) => {
       return error.response;
     });
-}
+};
 
 const FacultyService = {
   addCourse,
@@ -335,7 +334,7 @@ const FacultyService = {
   listUploadedAssignmentMaterial,
   assignGrade,
   getTeachers,
-  uploadVideo,
+  uploadVideo
 };
 
 export default FacultyService;

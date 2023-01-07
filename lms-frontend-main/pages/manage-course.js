@@ -97,7 +97,6 @@ function AddCourseDetails(props) {
     });
     AdminService.getTeachers().then((res) => {
       if (res?.status === 200) {
-        console.log(res.data.data, "res.data.data balajee");
         setTeachers(res.data.data);
       }
     });
@@ -237,7 +236,7 @@ function AddCourseDetails(props) {
       cd.image_1 = data[0]?.key;
       cd.curriculum_link = data[1]?.key;
       cd.instructor_image = data[2]?.key;
-      console.log(cd)
+      console.log(cd);
       AdminService.addCourse(cd).then((res) => {
         if (res?.status === 200) {
           props.cb(res.data.data);
