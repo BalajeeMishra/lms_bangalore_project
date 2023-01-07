@@ -215,10 +215,10 @@ const UploadVideo = () => {
               <h5 className="text-center  pb-50">Videos</h5>
               <div className=" ">
                 {materials.length === 0 && <label className="col-form-label form-label flex-Just-Center"> Looks like Course Materials list is empty</label>}
-                {materials.length > 0 &&
+                {materials.length > 0 ?
                   materials.map((uris, index) => {
                     return <CardViewDoc materials={uris} key={"materials" + index} />;
-                  })}
+                  }) : <h3>No videos yet</h3>}
               </div>
             </div>
           </section>
