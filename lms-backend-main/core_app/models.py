@@ -34,6 +34,16 @@ class Course(models.Model):
     is_deleted = models.BooleanField(default=False)
 
 
+class Module(models.Model):
+    course = models.ForeignKey(
+        Course, on_delete=models.CASCADE, related_name="course_module")
+    title = models.CharField(max_length=150)
+    description = models.TextField()
+    is_deleted = models.BooleanField(default=False)
+    teacher = models.ForeignKey(
+        Teacher, blank=True, null=True, on_delete=models.CASCADE)
+
+
 class CourseMaterial(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
@@ -70,6 +80,13 @@ class QuizQuestions (models.Model):
 
 class CourseQuiz(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, null=True)
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, null=True)
+    add_time = models.DateTimeField(auto_now_add=True)
+
+
+class ModuleQuiz(models.Model):
+    module = models.ForeignKey(
+        Module, on_delete=models.CASCADE, related_name="module_quiz")
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, null=True)
     add_time = models.DateTimeField(auto_now_add=True)
 

@@ -7,7 +7,7 @@ from core_app.models import *
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 # from django.http import JsonResponse
 from django.contrib.auth import authenticate
 import requests
@@ -391,6 +391,23 @@ class AddCourse(APIView):
 
         except Exception as e:
             return Response({"message": "Something went wrong!!", "error": e}, status=500)
+
+
+class ModuleViewSet(ModelViewSet):
+    serializer_class = ModuleSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self, request):
+        """
+        Return all modules or modules of a particular course
+        """
+        qs = Module.objects.all()
+        if "course_id" in request.data:
+            qs = qs.filter(course__id=request.data['course_id'])
+        return qs
+
+    def post(self, request):
+        pass
 
 
 class AddCourseQuiz(APIView):

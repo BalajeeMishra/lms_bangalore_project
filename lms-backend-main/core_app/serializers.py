@@ -42,6 +42,12 @@ class CourseSerializerList(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ModuleSerializer(serializers.ModelSerializer):
+    class Meta():
+        model = Module
+        fields = '__all__'
+
+
 class QuizQuestionSerializer(serializers.Serializer):
     quiz_id = serializers.IntegerField(required=True)
     questions = serializers.CharField(max_length=243, required=True)
@@ -56,6 +62,12 @@ class CourseQuizSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseQuiz
         fields = ('course', 'quiz',)
+
+
+class ModuleQuizSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ModuleQuiz
+        fields = ('module', 'quiz',)
 
 # class AssignmentSerializer(serializers.ModelSerializer):
 #     class Meta:
