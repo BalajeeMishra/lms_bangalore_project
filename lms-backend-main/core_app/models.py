@@ -1,4 +1,5 @@
 from email.policy import default
+import uuid
 from django.db import models
 # from django.contrib.auth.models import AbstractUser, get_user_model
 from django.contrib.auth import get_user_model
@@ -204,3 +205,13 @@ class StudentCourse(models.Model):
         Student, on_delete=models.CASCADE, related_name='enrolled_student_id')
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     enrolled_time = models.DateTimeField(auto_now_add=True)
+
+
+class Video(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    video_link = models.TextField(null=False)
+    course = models.ForeignKey(
+        Course, on_delete=models.CASCADE, related_name="course_videos")
+    user = models.ForeignKey(
+        User, blank=True, null=True, on_delete=models.CASCADE)

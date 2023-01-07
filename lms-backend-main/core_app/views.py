@@ -1100,6 +1100,70 @@ def store_recording_video(request):
     else:
         return Response({"message": "error"}, status=status.HTTP_400_BAD_REQUEST)
 
+
+class VideoViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = VideoSerializer
+
+    def get_queryset(self):
+        queryset = Video.objects.filter(user=self.request.user.id)
+        return queryset
+
+    # def list(self, request, *args, **kwargs):
+    #     queryset = Video.objects.filter(user=self.request.user.id)
+    #     serializer = VideoSerializer(queryset, many=True)
+    #     return Response(serializer.data, status=200)
+
+    def list(self, request):
+        try:
+            queryset = Video.objects.filter(user=self.request.user.id)
+
+            vids = dict()
+
+            for vid in queryset:
+                url = vid.video_link.split('/')
+                url.pop()
+                course_id = url.pop()
+                prefix_path = "/".join(url)+"/"
+                files_list = get_video_files(prefix_path, course_id)
+
+                if vid.course.id not in vids:
+                    vids[vid.course.id] = files_list
+                else:
+                    vids[vid.course.id] += files_list
+
+            print(vids)
+            files_list_ = [{"course_id": key, "file_list": value}
+                           for key, value in vids.items()]
+            print(files_list_)
+            return Response({"message": "success", "data": files_list_}, status=status.HTTP_200_OK)
+        except Exception:
+            return Response({"message": "failed to fetch"}, status=status.HTTP_409_CONFLICT)
+
+    def create(self, request, **kwargs):
+        """
+        Create a coupon
+        """
+        course_id = request.data['course_id']
+
+        request.data['user'] = self.request.user.id
+        files = request.FILES['file']
+        file_path = f"Videos/{request.data['user']}/{course_id}/{files.name}"
+        upload_status = upload_to_s3(files, file_path)
+        if upload_status:
+            request.data['video_link'] = file_path
+            request.data['course'] = course_id
+            serializer = VideoSerializer(
+                data=request.data, context={'request': request})
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            print(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({"message": "Not uploaded"}, status=status.HTTP_400_BAD_REQUEST)
+
 # def store_recording(request):
 #     if request.method == 'POST':
 #         file_download_link = get_meeting_recording(request.data['meeting_id'])
