@@ -120,7 +120,6 @@ def upload_to_s3(local_file, s3_file, bucket=AWS_BUCKET):
                       aws_secret_access_key=SECRET_KEY)
     try:
         s3.upload_fileobj(local_file, bucket, s3_file)
-        print("Upload Successful")
         return True
     except FileNotFoundError:
         print("The file was not found")

@@ -1057,9 +1057,9 @@ def store_recording(request):
         # file_download_link = get_meeting_recording(request.data['meeting_id'])
         # module = request.data['module'
         # ]
-        print(request.FILES, "request seeeeee")
+
         files = request.FILES["data"]
-        print(files, "aalokkkkk")
+
         # file_name = datetime.today().strftime('%d_%b_%Y_%H_%M')
         file_name = "balajee_aalok_123"
         # download_recording(file_download_link,
@@ -1067,7 +1067,6 @@ def store_recording(request):
         upload_status = upload_assessment_file(files,
                                                "./Recordings/{}.MP4".format(file_name))
 
-        print(upload_status, "upload_status by us")
         if upload_status:
             return Response({"message": "Recording successfully uploaded to aws storage"}, status=200)
         else:
@@ -1076,8 +1075,6 @@ def store_recording(request):
 
 @api_view(['POST',])
 def store_recording_video(request):
-    print(request.data)
-    print(request.FILES, "AaaaaaaaaaaaaaaaaaaaaaA")
     files = request.FILES['file']
     file_name = f"./Videos/{files.name}"
     upload_status = upload_to_s3(files, file_name)
