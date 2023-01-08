@@ -34,7 +34,7 @@ const UploadVideo = () => {
     FacultyService.uploadVideo(data).then((res) => {
       if (res.status == 202) {
         toast.success("Success: video uploaded successfully");
-        router.push("/upload-video");
+        // router.push("/upload-video");
         setSpinner(false);
         // alert("uploaded");
       } else {

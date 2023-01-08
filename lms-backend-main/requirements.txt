@@ -10,6 +10,7 @@ cryptography==38.0.4
 Django==3.2.16
 django-cors-headers==3.13.0
 django-crispy-forms==1.11.2
+django-filter==22.1
 django-tenant-schemas==1.11.0
 django-tenants==3.4.5
 django-zoom-meetings==0.1.0
