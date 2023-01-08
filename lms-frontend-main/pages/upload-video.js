@@ -12,17 +12,16 @@ import Layout from "../src/layout/Layout";
 import Card from "react-bootstrap/Card";
 import GenericModal from "../src/components/GenericModal";
 import Accordion from "react-bootstrap/esm/Accordion";
-import api from './api/api'
+import api from "./api/api";
 
 const UploadVideo = () => {
   const [input, setInput] = useState({
-    'course_id': "",
+    course_id: "",
     video_file: ""
   });
   const [spinner, setSpinner] = useState(false);
   const router = useRouter();
-  const [courseList, setCourseList] = useState([])
-
+  const [courseList, setCourseList] = useState([]);
 
   const [materials, setMaterials] = useState([]);
   useEffect(() => {
@@ -34,7 +33,9 @@ const UploadVideo = () => {
     });
   }, []);
 
-  useEffect(() => { console.log(materials) }, [materials]);
+  useEffect(() => {
+    console.log(materials);
+  }, [materials]);
 
   function splitIntoChunk(arr, chunk) {
     let allChunks = [];
@@ -53,29 +54,31 @@ const UploadVideo = () => {
         ...prevState,
         [name]: e.target.files[0]
       }));
-    }
-    else {
+    } else {
       setInput((prevState) => ({
         ...prevState,
         [name]: value
-
-      }))
+      }));
     }
   };
 
   useEffect(() => {
-    FacultyService.listCourse().then(res => {
+    FacultyService.listCourse().then((res) => {
       if (res && res.data && res.data.data) {
-        setCourseList(res.data.data)
+        setCourseList(res.data.data);
       }
-    })
-  }, [])
+    });
+  }, []);
 
   let course_List = [];
   if (courseList) {
-    console.log(courseList)
-    courseList.forEach(element => {
-      course_List.push(<option key={element.id} value={element.id}>{element.title}</option>)
+    console.log(courseList);
+    courseList.forEach((element) => {
+      course_List.push(
+        <option key={element.id} value={element.id}>
+          {element.title}
+        </option>
+      );
     });
   }
 
@@ -120,7 +123,15 @@ const UploadVideo = () => {
           props.materials.map((url, idx) => (
             <>
               {props.materials[idx] && props.materials[idx].file_list.length > 0 && (
-                <CardMap setDocKey={setDocKey} docKey={docKey} setShowModal={setShowModal} showModal={showModal} materials={props.materials[idx].file_list} cname={(courseList.filter((obj) => obj.id === props.materials[idx].course_id))[0].title} indx={idx} />
+                <CardMap
+                  setDocKey={setDocKey}
+                  docKey={docKey}
+                  setShowModal={setShowModal}
+                  showModal={showModal}
+                  materials={props.materials[idx].file_list}
+                  cname={courseList.filter((obj) => obj.id === props.materials[idx].course_id)[0].title}
+                  indx={idx}
+                />
               )}
             </>
           ))}
@@ -178,18 +189,12 @@ const UploadVideo = () => {
       {!spinner && (
         <FacLayout>
           <div className="form-group row">
-
             <div className="col-sm-9 col-md-9">
               <Form.Group controlId="formFileLg" className="mb-3">
                 <div className="form-group row">
                   <label className="col-sm-3 col-form-label form-label">Select Course</label>
                   <div className="col-sm-9 col-md-9">
-                    <select
-                      id="select_course"
-                      name="course_id"
-                      value={input.course_id}
-                      onChange={handleChangeFile}
-                      className="form-select">
+                    <select id="select_course" name="course_id" value={input.course_id} onChange={handleChangeFile} className="form-select">
                       <option value="">Select Course</option>
                       {course_List}
                     </select>
@@ -215,17 +220,19 @@ const UploadVideo = () => {
               <h5 className="text-center  pb-50">Videos</h5>
               <div className=" ">
                 {materials.length === 0 && <label className="col-form-label form-label flex-Just-Center"> Looks like Course Materials list is empty</label>}
-                {materials.length > 0 ?
+                {materials.length > 0 ? (
                   materials.map((uris, index) => {
                     return <CardViewDoc materials={uris} key={"materials" + index} />;
-                  }) : <h3>No videos yet</h3>}
+                  })
+                ) : (
+                  <h3>No videos yet</h3>
+                )}
               </div>
             </div>
           </section>
         </FacLayout>
       )}
     </>
-
   );
 };
 

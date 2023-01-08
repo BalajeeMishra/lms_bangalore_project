@@ -5,11 +5,6 @@ import CardView from "./CardView";
 const VidRecordings = () => {
   const [records, setRecords] = useState([]);
 
-  //   const videos = [
-  //     "https://drive.google.com/file/d/1jZ2A2r7sR2IRPTdeeGRU2EJ-60OrrHWZ/view?usp=sharing",
-  //     "https://drive.google.com/file/d/1CeU64lj9PhyETshbR7vFjYEOoIZ9MOHF/view?usp=sharing",
-  //     "https://drive.google.com/file/d/1DW-v-Kpag4Rj-gVQYK75dgLdMp0orWBJ/view?usp=sharing"
-  //   ];
   useEffect(() => {
     const chunk = 3;
     // splitIntoChunk(perRowUrls, chunk);

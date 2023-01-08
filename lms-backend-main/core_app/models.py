@@ -231,3 +231,13 @@ class Video(models.Model):
         Course, on_delete=models.CASCADE, related_name="course_videos")
     user = models.ForeignKey(
         User, blank=True, null=True, on_delete=models.CASCADE)
+
+
+class Feedback(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=250, null=True, blank=True)
+    mobile = models.CharField(max_length=32, null=True, blank=True)
+    course_name = models.ForeignKey(Course, on_delete=models.CASCADE)
+    batch_name = models.CharField(max_length=50, null=True, blank=True)
+    detail = models.TextField(null=True, blank=True)
+    feedback_timing = models.DateTimeField(auto_now_add=True)

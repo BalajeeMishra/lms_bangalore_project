@@ -14,9 +14,7 @@ const addCourse = (courseData) => {
 };
 const addModule = (courseData) => {
   return api
-    .post("/module",
-      courseData
-    )
+    .post("/module", courseData)
     .then((response) => {
       return response;
     })
@@ -61,9 +59,7 @@ const updateCourse = (courseData, id) => {
 };
 const updateModule = (moduleData, id) => {
   return api
-    .put("/module/" + id,
-      moduleData
-    )
+    .put("/module/" + id, moduleData)
     .then((response) => {
       return response;
     })
@@ -372,11 +368,12 @@ const uploadVideo = (data) => {
 };
 
 const listVideo = () => {
-  return api.get("/video")
-    .then(response => {
+  return api
+    .get("/video")
+    .then((response) => {
       return response;
     })
-    .catch(error => {
+    .catch((error) => {
       return error.response;
     });
 };

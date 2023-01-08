@@ -99,8 +99,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'lms_prod',
         'USER': 'postgres',
-        # 'PASSWORD': 'Balajee123',
-        'PASSWORD': 'abc123',
+        'PASSWORD': 'Balajee123',
+        # 'PASSWORD': 'abc123',
         # 'PASSWORD': 'CaprA4rEgEbRUtrIxAch',
         # 'HOST': '3.111.73.127',
         'HOST': 'localhost',
@@ -232,7 +232,6 @@ ENCRYPTION_KEY = "K125jgktQC-7Algihk0xO9MbrshfUx2-PTE-ztjHJIg="
 # production
 # AWS_KEY = "AKIAZCLTTESHN4SB4G4W"
 # AWS_SEC = "AQJRlgxbSDVbY4/8Vd1VXkvhgRC3/5iGug04A6YF"
-
 AWS_KEY = "AKIAW4HSXEZSXNY7GHXI"
 AWS_SEC = "Dpp6xU/TBMEnGxySsRy94elyZNTEY9z7p4Ntyh9e"
 # AWS_KEY = "AKIAW4HSXEZSULA24FWL"
@@ -244,7 +243,7 @@ AWS_SEC = "Dpp6xU/TBMEnGxySsRy94elyZNTEY9z7p4Ntyh9e"
 # prodution
 # BUCKET_NAME = "sambodhieducationnestss3"
 BUCKET_NAME = "lms-utilitie-bucket"
-S3_LINK = "https://lms-recordings.s3.ap-south-1.amazonaws.com/"
+S3_LINK = "https://lms-utilitie-bucket.s3.ap-south-1.amazonaws.com/"
 
 
 # HOST_URL = "http://lmsmle.educationnest.com"
