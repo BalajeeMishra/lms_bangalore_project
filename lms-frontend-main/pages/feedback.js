@@ -6,6 +6,9 @@ import StudentService from "./api/student.service";
 import AdminService from "./api/admin.service";
 import Layout from "../src/layout/Layout";
 import PageBanner from "../src/components/PageBanner";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useRouter } from "next/router";
 
 function FeedBack() {
   const [input, setInput] = useState({
@@ -18,7 +21,7 @@ function FeedBack() {
   });
 
   const [course, setCourse] = useState([]);
-
+  const router = useRouter();
   const fn = async () => {
     const response = await AdminService.listCourseDetails();
     setCourse(response.data.data);
@@ -39,7 +42,11 @@ function FeedBack() {
   const feedbackFormDetails = async (e) => {
     e.preventDefault();
     const response = await StudentService.createfeedback(input);
-    console.log(input, "balajee", response);
+    if (response.status == 200) {
+      return toast.success("Feedback submitted successfully, we will back to you soon");
+    } else {
+      return toast.error("something went wrong, Please try again");
+    }
   };
 
   return (
@@ -116,6 +123,7 @@ function FeedBack() {
             </Form>
           </div>
         </div>
+        <ToastContainer autoClose={2000} />
       </Layout>
     </>
   );

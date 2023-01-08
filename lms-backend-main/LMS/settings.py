@@ -103,7 +103,9 @@ DATABASES = {
         # 'PASSWORD': 'abc123',
         # 'PASSWORD': 'CaprA4rEgEbRUtrIxAch',
         # 'HOST': '3.111.73.127',
-        'HOST': 'localhost',
+        # 'HOST': 'localhost',
+        # 'HOST': '172.17.0.2',
+        'HOST': '127.0.0.1',
         'PORT': '5432',
     }
 }
