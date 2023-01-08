@@ -1,6 +1,11 @@
 from django.urls import path, include
 from core_app.views import *
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework import routers
+
+router = routers.DefaultRouter(trailing_slash=False)
+router.register(r'video', VideoViewSet, basename='video')
+router.register('module',ModuleViewSet, basename="module")
 
 urlpatterns = [
     path('login', signin.as_view(), name='login'),
@@ -72,4 +77,6 @@ urlpatterns = [
     path('add_grade/<int:submitted_assigment_id>', AssignGrade.as_view()),
     path('teacher', GetTeacher.as_view()),
     path('enquire', CourseEnquire.as_view()),
+
+    path('', include(router.urls))
 ]

@@ -9,15 +9,17 @@ import TabLayout from "../src/components/Tabs";
 import CourseMaterialsView from "../src/components/CourseMaterialsView";
 import GenericModal from "../src/components/GenericModal";
 import StudentService from "./api/student.service";
+import Card from "react-bootstrap/esm/Card";
+import Accordion from "react-bootstrap/esm/Accordion";
 
 const initialState = {
     course_title: "",
-    course_desc: "",
-    course_category: "",
+    description: "",
+    course_id: "",
     course_material: ""
 };
 
-const AddCourse = () => {
+const AddModule = () => {
 
     const [modalToggle, setModalToggle] = useState(false);
     const [deleteToggle, setDeleteToggle] = useState(false);
@@ -26,15 +28,16 @@ const AddCourse = () => {
     const [tabName, setTabName] = useState(null)
 
     const [input, setInput] = useState({
-        course_title: "",
-        course_desc: "",
-        course_category: "",
+        title: "",
+        description: "",
+        course_id: "",
         course_material: "",
         id: ""
     });
     const [error, setError] = useState("");
     const [courseList, setCourseList] = useState([]);
-    const [courseCateogery, setCourseCateogery] = useState();
+    const [moduleList, setModuleList] = useState([]);
+    const [courseId, setCourseCateogery] = useState();
     const [validation, setValidation] = useState(false);
     const [materials, setMaterials] = useState([]);
     const [isupdate, setIsupdate] = useState(false);
@@ -55,7 +58,7 @@ const AddCourse = () => {
             chunkArray = arr.slice(i, i + chunk);
             allChunks.push(chunkArray)
         }
-        if(type === "materials"){
+        if (type === "materials") {
             setMaterials(allChunks)
         }
 
@@ -86,34 +89,38 @@ const AddCourse = () => {
             }
         })
 
+        FacultyService.listModule().then(res => {
+            if (res && res.data) {
+                setModuleList(res.data)
+            }
+        })
         FacultyService.getCourseCateogery().then(res => {
             if (res && res.data && res.data.data) {
                 setCourseCateogery(res.data.data)
             }
         })
     }, []);
-
     const submitCourse = e => {
         e.preventDefault()
-        let { course_title, course_desc, course_category, course_material,id } = input;
+        let { title, description, course_id, course_material, id } = input;
         let validation_ = false;
         let course_data = {
-            "title": course_title,
-            "description": course_desc,
-            "category_id": course_category
+            "title": title,
+            "description": description,
+            "course": course_id
         }
 
-        if (course_title == "") {
+        if (title == "") {
             setError("Module Title should not be empty")
             setValidation(true)
             validation_ = true
         }
-        else if (course_desc == "") {
+        else if (description == "") {
             setError("Module description should not be empty")
             setValidation(true)
             validation_ = true
         }
-        else if (course_category == "") {
+        else if (course_id == "") {
             setError("Course category should not be empty")
             setValidation(true)
             validation_ = true
@@ -122,122 +129,123 @@ const AddCourse = () => {
         if (validation_ == false) {
 
             if (!isupdate && !isDelete) {
-                FacultyService.addCourse(course_data).then(res => {
-                    if (res.status == 200) {
+                FacultyService.addModule(course_data).then(res => {
+                    if (res.status == 201) {
                         setError("")
                         setModalToggle(false)
                         setInput({ ...initialState });
-                        toast.success("Success: Course added");
-                        let courseId = res && res.data && res.data.data;
-                        let formData = new FormData();
-                        formData.append("file", course_material);
+                        toast.success("Success: Module added");
+                        let moduleId = res && res.data && res.data.data;
+                        // let formData = new FormData();
+                        // formData.append("file", course_material);
                         let md = {
-                            folderName: 'Course',
-                            id: courseId,
-                            formdata: formData
+                            folderName: 'Module',
+                            id: moduleId,
+                            // formdata: formData
                         }
-                        let file_data = {
-                            "course_id": courseId,
-                            formdata: formData
-                        }
-                        if (file_data) {
-                            FacultyService.uploadCourse(file_data).then(res => {
-                                console.log("uploaded res", res)
-                            }).catch(err => {
-                                console.log('err = ', err)
-                            })
-                        }
-                        FacultyService.listCourse().then(res => {
-                            if (res && res.data && res.data.data) {
-                                setCourseList(res.data.data)
+                        // let file_data = {
+                        //     "course": course_id,
+                        //     formdata: formData
+                        // }
+                        // if (file_data) {
+                        //     FacultyService.uploadCourse(file_data).then(res => {
+                        //         console.log("uploaded res", res)
+                        //     }).catch(err => {
+                        //         console.log('err = ', err)
+                        //     })
+                        // }
+                        FacultyService.listModule(course_id).then(res => {
+                            if (res && res.data) {
+                                setModuleList(res.data)
                             }
                         })
                     } else {
+                        console.log(res.data);
                         setError(res.data.message)
                     }
                 })
-                .catch(err => {
-                    setError(err)
-                })
+                    .catch(err => {
+                        setError(err)
+                    })
             } else if (isupdate && !isDelete) {
 
-                FacultyService.updateCourse(course_data, id).then(res => {
+                FacultyService.updateModule(course_data, id).then(res => {
                     if (res.status == 200) {
                         setError("")
                         setModalToggle(false)
                         setInput({ ...initialState });
-                        toast.success("Success: Course Updated");  
-                        FacultyService.listCourse().then(res => {
-                            if (res && res.data && res.data.data) {
-                                setCourseList(res.data.data)
+                        toast.success("Success: Module Updated");
+                        FacultyService.listModule().then(res => {
+                            if (res && res.data) {
+                                setModuleList(res.data)
                             }
                         })
                     } else {
                         setError(res.data.message)
                     }
                 })
-                .catch(err => {
-                    setError(err)
-                })
+                    .catch(err => {
+                        setError(err)
+                    })
                 setIsupdate(false)
             } else if (isDelete) {
                 console.log("dlete", isDelete)
-                FacultyService.deleteCourse(id).then(res => {
-                    if (res.status == 200) {
+                FacultyService.deleteModule(id).then(res => {
+                    if (res.status == 204) {
                         setError("")
                         setDeleteToggle(false)
                         setInput({ ...initialState });
-                        toast.success("Success: Course Deleted");  
-                        FacultyService.listCourse().then(res => {
-                            if (res && res.data && res.data.data) {
-                                setCourseList(res.data.data)
+                        toast.success("Success: Module Deleted");
+                        FacultyService.listModule().then(res => {
+                            if (res && res.data) {
+                                setModuleList(res.data)
                             } else {
-                                setCourseList([])
+                                setModuleList([])
                             }
                         })
                     } else {
+                        toast.error(res.data.message)
                         setError(res.data.message)
                     }
                 })
-                .catch(err => {
-                    setError(err)
-                })
+                    .catch(err => {
+                        setError(err)
+                    })
                 setIsDelete(false)
             }
         }
     }
 
     const handleEventModal = () => {
-        setInput({...initialState})
+        setInput({ ...initialState })
         setModalToggle(true);
         setIsupdate(false)
     }
-    
-    function handleEditCourse(element){
+
+    function handleEditCourse(element) {
         const editState = {
-            course_title: element?.title ,
-            course_desc: element?.description,
-            course_category: element?.category,
+            title: element?.title,
+            description: element?.description,
+            course_id: element?.course,
             id: element?.id
             // course_material: ""
         };
-        setInput({...editState})
-        setModalToggle(true);
+        setInput({ ...editState })
         setIsupdate(true)
+        setModalToggle(true);
     }
 
-    function handleDeleteCourse(element) {
+    function handleDeleteModule(element) {
         const deleteState = {
             id: element?.id
         };
-        setInput({...deleteState})
+        setInput({ ...deleteState })
         setDeleteToggle(true);
     }
-
-    let course_list = []
-    if (courseList) {
-        courseList.forEach((element, index) => {
-            course_list.push(
+    let mod_list = new Object()
+    if (moduleList) {
+        moduleList.forEach((element, index) => {
+            let mod = (
                 <div className="card card-sm" key={element.title + '_' + element.id}>
                     <div className="card-body media">
                         <div className="media-left">
@@ -251,24 +259,23 @@ const AddCourse = () => {
                         </div>
                     </div>
                     <div className="card-footer text-center">
-                        <button onClick={()=>{ handleEditCourse(element);}} className="btn btn-default btn-sm float-right">
-                        <i className="fas fa-edit"></i> Edit 
+                        <button onClick={() => { handleEditCourse(element); }} className="btn btn-default btn-sm float-right">
+                            <i className="fas fa-edit"></i> Edit
                         </button>
-                        <button onClick={()=>{ handleDeleteCourse(element);}} className="btn btn-default btn-sm float-right">
-                        <i className="fas fa-trash"></i> Delete 
+                        <button onClick={() => { handleDeleteModule(element); }} className="btn btn-default btn-sm float-right">
+                            <i className="fas fa-trash"></i> Delete
                         </button>
                         <div className="clearfix"></div>
                     </div>
-                    
+
                 </div>
             )
-        });
-    }
-
-    let course_category_ = [];
-    if (courseCateogery) {
-        courseCateogery.forEach(element => {
-            course_category_.push(<option key={element.id} value={element.id}>{element.title}</option>)
+            if (mod_list[element.course]) {
+                mod_list[element.course].push(mod)
+            }
+            else {
+                mod_list[element.course] = [mod]
+            }
         });
     }
 
@@ -279,20 +286,44 @@ const AddCourse = () => {
         });
     }
 
+    let course_mods = []
+    if (mod_list && courseList) {
+        courseList.forEach((course, index) => {
+            if (mod_list[course.id]) {
+                course_mods.push(
+                    <Accordion defaultActiveKey="0">
+                        <Card >
+                            <Accordion.Toggle as={Card.Header} eventKey={index.toString()} className="cursorPointer">
+                                Course Name: {course.title}  <i className="fas fa-angle-down float-right"></i>
+                            </Accordion.Toggle>
+                            <Accordion.Collapse eventKey={index.toString()}>
+                                <Card.Body>
+                                    <div className="card-columns">
+                                        {mod_list[course.id]}
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+
+                        </Card>
+                    </Accordion>
+                )
+            }
+        })
+    }
+
     function ModuleTab() {
         return (
             <>
                 <div className="col-lg-12 mb-4 p-0">
                     <button type="submit" className="btn btn-success" onClick={handleEventModal}>+ New Module</button>
                 </div>
-                <div className="card-columns">
-                    {course_list}
-                </div>
+                {course_mods}
+
             </>
         )
     }
     function ShowList() {
-        if(tabName !=='Course Materials'){
+        if (tabName !== 'Course Materials') {
             return
         }
         function Content() {
@@ -316,7 +347,7 @@ const AddCourse = () => {
                 }
                 FacultyService.uploadCourse(md).then(res => {
                     setShowGenericModal(false)
-                    if (res && res.status === 200){
+                    if (res && res.status === 200) {
                         toast.success("Success: Course Material Uploaded");
                         const chunk = 4;
                         StudentService.listCourseMaterial().then(res => {
@@ -324,9 +355,9 @@ const AddCourse = () => {
                                 splitIntoChunk(res.data.data, chunk, 'materials');
                             }
                         })
-                    }else{
+                    } else {
                         toast.error("Course Material failed Uploading");
-                    } 
+                    }
                 }).catch(err => {
                     toast.error("Course Material failed Uploading");
                     console.log('err = ', err)
@@ -352,17 +383,17 @@ const AddCourse = () => {
                             </select>
                         </div>
                     </div>
-                    {!isupdate &&
-                    <div className="form-group row">
-                        <label className="col-sm-3 col-form-label form-label">Course material</label>
-                        <div className="col-sm-9 col-md-9">
-                            <Form.Group controlId="formFileLg" className="mb-3">
-                                {/* <Form.Label>Large file input example</Form.Label> */}
+                    {isupdate ? <></> :
+                        <div className="form-group row">
+                            <label className="col-sm-3 col-form-label form-label">Course material</label>
+                            <div className="col-sm-9 col-md-9">
+                                <Form.Group controlId="formFileLg" className="mb-3">
+                                    {/* <Form.Label>Large file input example</Form.Label> */}
 
-                                <input onChange={handleChangeFile} type="file" size="lg" name="course_material" />
-                            </Form.Group>
+                                    <input onChange={handleChangeFile} type="file" size="lg" name="course_material" />
+                                </Form.Group>
+                            </div>
                         </div>
-                    </div>
                     }
                     <div className="col-lg-12 mb-4 p-0">
                         <button type="submit" className="btn btn-success" onClick={() => { uploadCM() }}>Upload</button>
@@ -375,7 +406,7 @@ const AddCourse = () => {
                 <div className="col-lg-12 mb-4 p-0">
                     <button type="submit" className="btn btn-success" onClick={() => { setShowGenericModal(true) }}>+ Add Course Material</button>
                 </div>
-               {showGenericModal&& <GenericModal xl={false} hideClose={true} setShowModal={setShowGenericModal} showModal={showGenericModal} header={"Course Material"} content={<Content />}  />}
+                {showGenericModal && <GenericModal xl={false} hideClose={true} setShowModal={setShowGenericModal} showModal={showGenericModal} header={"Course Material"} content={<Content />} />}
                 <CourseMaterialsView materials={materials} />
             </div>
         )
@@ -385,8 +416,8 @@ const AddCourse = () => {
             <p className='title-db'>HOME / MODULE / COURSE MATERIALS</p>
             <div className="container assignMentModel">
 
-                {modalToggle && 
-                <Modal
+                {modalToggle &&
+                    <Modal
                         title="Module"
                         toggle={modalToggle}
                         onClose={() => { setModalToggle(false) }} >
@@ -398,8 +429,8 @@ const AddCourse = () => {
                                         <label className="col-sm-3 col-form-label form-label">Module Title:</label>
                                         <div className="col-sm-9 col-md-9">
                                             <input id="quiz_title"
-                                                name="course_title"
-                                                value={input.course_title}
+                                                name="title"
+                                                value={input.title}
                                                 onChange={handleChange}
                                                 type="text"
                                                 className="form-control"
@@ -412,9 +443,9 @@ const AddCourse = () => {
                                         <div className="col-sm-9 col-md-9">
                                             <textarea
                                                 className="form-control"
-                                                id="course_desc"
-                                                name="course_desc"
-                                                value={input.course_desc}
+                                                id="description"
+                                                name="description"
+                                                value={input.description}
                                                 onChange={handleChange}
                                                 rows="2"></textarea>
                                         </div>
@@ -437,26 +468,26 @@ const AddCourse = () => {
                                         <label className="col-sm-3 col-form-label form-label">Course</label>
                                         <div className="col-sm-9 col-md-9">
                                             <select
-                                                id="course_category"
-                                                name="course_category"
-                                                value={input.course_category}
+                                                id="course"
+                                                name="course_id"
+                                                value={input.course_id}
                                                 onChange={handleChange}
                                                 className="form-select">
                                                 <option value="">Select Course</option>
-                                                {course_category_}
+                                                {course_List}
                                             </select>
                                         </div>
                                     </div>
-                                    <div className="form-group row">
-                                        <label className="col-sm-3 col-form-label form-label">Course material</label>
-                                        <div className="col-sm-9 col-md-9">
-                                            <Form.Group controlId="formFileLg" className="mb-3">
-                                                {/* <Form.Label>Large file input example</Form.Label> */}
+                                    {/* <div className="form-group row"> */}
+                                    {/* <label className="col-sm-3 col-form-label form-label">Course material</label> */}
+                                    {/* <div className="col-sm-9 col-md-9"> */}
+                                    {/* <Form.Group controlId="formFileLg" className="mb-3"> */}
+                                    {/* <Form.Label>Large file input example</Form.Label> */}
 
-                                                <input onChange={handleChange} type="file" size="lg" name="course_material" />
-                                            </Form.Group>
-                                        </div>
-                                    </div>
+                                    {/* <input onChange={handleChange} type="file" size="lg" name="course_material" /> */}
+                                    {/* </Form.Group> */}
+                                    {/* </div> */}
+                                    {/* </div> */}
 
 
                                     <div className="form-group row mb-0">
@@ -467,29 +498,29 @@ const AddCourse = () => {
                                 </form>
                             </div>
                         </div>
-                </Modal>
+                    </Modal>
                 }
 
-                {deleteToggle && 
-                <Modal
-                title="Module"
-                toggle={deleteToggle}
-                onClose={() => { setDeleteToggle(false) }} >
-                    <form onSubmit={submitCourse} autoComplete="off">
-                        <div className="row m-3">
-                            <div className="col-lg-12 col-md-12">
-                                <div className="form-group row mb-0">
-                                    <div className="col-sm-6">
-                                        <button type="submit" onClick={() => {setIsDelete(true)}} className="btn btn-warning">Delete</button>
-                                    </div>
-                                    <div className="col-sm-6">
-                                        <button type="submit" onClick={() => {setDeleteToggle(false)}} className="btn btn-primary">Cancel</button>
+                {deleteToggle &&
+                    <Modal
+                        title="Module"
+                        toggle={deleteToggle}
+                        onClose={() => { setDeleteToggle(false) }} >
+                        <form onSubmit={submitCourse} autoComplete="off">
+                            <div className="row m-3">
+                                <div className="col-lg-12 col-md-12">
+                                    <div className="form-group row mb-0">
+                                        <div className="col-sm-6">
+                                            <button type="submit" onClick={() => { setIsDelete(true) }} className="btn btn-warning">Delete</button>
+                                        </div>
+                                        <div className="col-sm-6">
+                                            <button type="submit" onClick={() => { setDeleteToggle(false) }} className="btn btn-primary">Cancel</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
-                </Modal>
+                        </form>
+                    </Modal>
                 }
 
                 <div className="row ">
@@ -505,4 +536,4 @@ const AddCourse = () => {
         </FacLayout>
     )
 }
-export default AddCourse;
+export default AddModule;

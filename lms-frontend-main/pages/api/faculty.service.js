@@ -12,10 +12,33 @@ const addCourse = (courseData) => {
       return error.response;
     });
 };
+const addModule = (courseData) => {
+  return api
+    .post("/module",
+      courseData
+    )
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      return error.response;
+    });
+};
 
 const listCourse = () => {
   return api
     .get("/add_course")
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      return error.response;
+    });
+};
+
+const listModule = () => {
+  return api
+    .get("/module")
     .then((response) => {
       return response;
     })
@@ -36,10 +59,32 @@ const updateCourse = (courseData, id) => {
       return error.response;
     });
 };
+const updateModule = (moduleData, id) => {
+  return api
+    .put("/module/" + id,
+      moduleData
+    )
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      return error.response;
+    });
+};
 
 const deleteCourse = (id) => {
   return api
     .delete("/add_course/" + id)
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      return error.response;
+    });
+};
+const deleteModule = (id) => {
+  return api
+    .delete("/module/" + id)
     .then((response) => {
       return response;
     })
@@ -296,7 +341,7 @@ const getTeachers = () => {
 
 const uploadVideo = (data) => {
   return api
-    .post("/store_recording_video", data.form_data, {
+    .post(`/video`, data.form_data, {
       headers: {
         "Content-Type": "multipart/form-data"
       }
@@ -305,6 +350,16 @@ const uploadVideo = (data) => {
       return response;
     })
     .catch((error) => {
+      return error.response;
+    });
+};
+
+const listVideo = () => {
+  return api.get("/video")
+    .then(response => {
+      return response;
+    })
+    .catch(error => {
       return error.response;
     });
 };
@@ -334,7 +389,12 @@ const FacultyService = {
   listUploadedAssignmentMaterial,
   assignGrade,
   getTeachers,
-  uploadVideo
+  uploadVideo,
+  listVideo,
+  addModule,
+  listModule,
+  updateModule,
+  deleteModule
 };
 
 export default FacultyService;

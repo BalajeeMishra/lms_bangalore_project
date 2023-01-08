@@ -8,7 +8,7 @@ function FacLayout({ children }) {
   const menuList = [
     // {name: "Dashboard", link: "faculty-dashboard", icon: "fa fa-home"},
     { name: "Student List", link: "faculty-student-list", icon: "fas fa-users" },
-    { name: "Add Module / Course Materials", link: "faculty-add-course", icon: "fas fa-book-open" },
+    { name: "Add Module / Course Materials", link: "faculty-add-module", icon: "fas fa-book-open" },
     { name: "Add Quiz", link: "faculty-add-quiz", icon: "fas fa-puzzle-piece" },
     { name: "Add Quiz Question", link: "faculty-add-quiz-questions", icon: "far fa-list-alt" },
     { name: "Add Assignment", link: "faculty-add-assignment", icon: "fas fa-book-reader" },

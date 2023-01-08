@@ -7,7 +7,7 @@ from core_app.models import *
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 # from django.http import JsonResponse
 from django.contrib.auth import authenticate
 import requests
@@ -391,6 +391,42 @@ class AddCourse(APIView):
 
         except Exception as e:
             return Response({"message": "Something went wrong!!", "error": e}, status=500)
+
+
+class ModuleViewSet(ModelViewSet):
+    serializer_class = ModuleSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        Return all modules
+        """
+        qs = Module.objects.all()
+        return qs
+
+    def list(self, request, *args, **kwargs):
+        """
+        Return list of all modules
+        """
+        teacher = get_object_or_404(Teacher, user_id=request.user.id)
+        qs = Module.objects.filter(teacher=teacher.id)
+        if "course_id" in request.data:
+            qs = qs.filter(course__id=request.data['course_id'])
+        serializer = ModuleSerializer(qs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def create(self, request, *args, **kwargs):
+        """
+        Create a new module
+        """
+        teacher = get_object_or_404(Teacher, user_id=request.user.id)
+        request.data['teacher'] = teacher.id
+        serializer = ModuleSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_417_EXPECTATION_FAILED)
 
 
 class AddCourseQuiz(APIView):
@@ -1029,10 +1065,14 @@ class StudentCourseMaterialList(APIView):
 
     def get(self, request):
         try:
-            stu = get_object_or_404(Student, user_id=request.user.id)
-            course_material = CourseMaterial.objects.filter(
-                course__in=list(Course.objects.filter(is_deleted=False, id__in=list(StudentCourse.objects.filter(student=stu.id).values_list("course", flat=True))).values_list("id", flat=True)))
-
+            try:
+                stu = get_object_or_404(Student, user_id=request.user.id)
+                course_material = CourseMaterial.objects.filter(
+                    course__in=list(Course.objects.filter(is_deleted=False, id__in=list(StudentCourse.objects.filter(student=stu.id).values_list("course", flat=True))).values_list("id", flat=True)))
+            except Exception:
+                teacher = get_object_or_404(Teacher, user_id=request.user.id)
+                course_material = CourseMaterial.objects.filter(course__in=list(
+                    Course.objects.filter(is_deleted=False, teacher__id=teacher.id)))
             unique_course = dict()
             for material in course_material:
                 url = material.material_url.split('/')
@@ -1082,6 +1122,68 @@ def store_recording_video(request):
         return Response({"message": "File successfully saved"}, status=status.HTTP_202_ACCEPTED)
     else:
         return Response({"message": "error"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class VideoViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = VideoSerializer
+
+    def get_queryset(self):
+        queryset = Video.objects.filter(user=self.request.user.id)
+        return queryset
+
+    # def list(self, request, *args, **kwargs):
+    #     queryset = Video.objects.filter(user=self.request.user.id)
+    #     serializer = VideoSerializer(queryset, many=True)
+    #     return Response(serializer.data, status=200)
+
+    def list(self, request):
+        try:
+            queryset = Video.objects.filter(user=self.request.user.id)
+
+            vids = dict()
+
+            for vid in queryset:
+                url = vid.video_link.split('/')
+                url.pop()
+                course_id = url.pop()
+                prefix_path = "/".join(url)+"/"
+                files_list = get_video_files(prefix_path, course_id)
+
+                if vid.course.id not in vids:
+                    vids[vid.course.id] = files_list
+                else:
+                    vids[vid.course.id] += files_list
+
+            files_list_ = [{"course_id": key, "file_list": value}
+                           for key, value in vids.items()]
+            return Response({"message": "success", "data": files_list_}, status=status.HTTP_200_OK)
+        except Exception:
+            return Response({"message": "failed to fetch"}, status=status.HTTP_409_CONFLICT)
+
+    def create(self, request, **kwargs):
+        """
+        Create a video
+        """
+        course_id = request.data['course_id']
+
+        request.data['user'] = self.request.user.id
+        files = request.FILES['file']
+        file_path = f"Videos/{request.data['user']}/{course_id}/{files.name}"
+        upload_status = upload_to_s3(files, file_path)
+        if upload_status:
+            request.data['video_link'] = file_path
+            request.data['course'] = course_id
+            serializer = VideoSerializer(
+                data=request.data, context={'request': request})
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            print(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({"message": "Not uploaded"}, status=status.HTTP_400_BAD_REQUEST)
 
 # def store_recording(request):
 #     if request.method == 'POST':

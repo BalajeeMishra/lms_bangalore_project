@@ -127,3 +127,32 @@ def upload_to_s3(local_file, s3_file, bucket=AWS_BUCKET):
     except NoCredentialsError:
         print("Credentials not available")
         return False
+
+
+def get_video_files(path, course_id=None, bucket_name=AWS_BUCKET):
+    # List of file
+    s3 = boto3.client('s3', aws_access_key_id=ACCESS_KEY,
+                      aws_secret_access_key=SECRET_KEY)
+    if settings.ENV == "Dev":
+        prefix = "Dev/"+path
+    else:
+        prefix = path
+    try:
+        if course_id is not None:
+            prefix = prefix+str(course_id)+"/"
+        get_all = s3.list_objects(Bucket=bucket_name, Prefix=prefix)
+        list = []
+        if get_all.get('Contents') is not None:
+            for o in get_all.get('Contents'):
+
+                if o['Size'] > 0:
+                    temp = o['Key'].replace(path, "").split("/")
+                    obj = {
+                        "Key": o['Key'],
+                        "course_id": temp[1] if settings.ENV == "Dev" else temp[0],
+                        "file_name": temp[2] if settings.ENV == "Dev" else temp[1]}
+                    list.append(obj)
+        return list
+    except ClientError as e:
+        print("Error", e)
+        return []
