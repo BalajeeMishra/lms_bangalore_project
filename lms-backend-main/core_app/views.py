@@ -216,6 +216,41 @@ class AddQuiz(APIView):
         #     return Response({"message":serializer.errors},status=400)
 
 
+class AddModuleQuiz(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+
+        data = None
+        if "quizData" in request.data:
+            data = request.data['quizData']
+        else:
+            data = request.data
+        if data:
+            teacher = Teacher.objects.get(user=user)
+            if teacher:
+                title = data['title']
+                detail = data['detail']
+                module_id = data['module_id']
+
+                teacher_obj = Teacher.objects.get(user_id=request.user.id)
+                module_obj = Module.objects.get(id=module_id)
+                if Quiz.objects.filter(teacher=teacher_obj, title=title, is_deleted=False).exists():
+                    return Response({'message': f'Quiz already present'}, status=200)
+
+                quiz = Quiz(teacher=teacher_obj, title=title, detail=detail)
+                quiz.save()
+
+                module_quiz = ModuleQuiz(module=module_obj, quiz=quiz)
+                module_quiz.save()
+                return Response({'message': f'Quiz saved for {teacher.user}'}, status=200)
+            else:
+                return Response({'message': f'Teacher not present'}, status=400)
+        else:
+            return Response({'message': 'Empty payload !'}, status=400)
+
+
 class AddQuizQuestions(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -710,9 +745,9 @@ class StudentQuizList(APIView):
 
     def get(self, request):
         student_obj = Student.objects.get(user_id=request.user.id)
-
-        users_quiz = Quiz.objects.filter(is_deleted=False, id__in=CourseQuiz.objects.filter(
-            course__in=Course.objects.filter(is_deleted=False, id__in=StudentCourse.objects.filter(student=request.user.id))))
+        users_quiz = Quiz.objects.filter(is_deleted=False, id__in=list(CourseQuiz.objects.filter(
+            course__in=list(Course.objects.filter(is_deleted=False, id__in=list(
+                StudentCourse.objects.filter(student__user=request.user).values_list('course', flat=True))).values_list('id', flat=True))).values_list('quiz', flat=True)))
 
         serializer = QuizSerializer(users_quiz, many=True)
         for idx, x in enumerate(serializer.data):

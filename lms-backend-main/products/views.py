@@ -7,7 +7,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from LMS import settings
 from core_app.aws_interface import get_assessment_files, upload_assessment_file
 from core_app.serializers import CourseSerializerList
-
+from core_app.models import Student, StudentCourse
 from products.models import CourseDetails
 from products.serializers import *
 
@@ -24,6 +24,28 @@ class GetCourseDetails(APIView):
             try:
                 course_detail = CourseDetails.objects.filter(
                     category=category_id, is_deleted=False)
+                serializer = CourseDetailsGet(course_detail, many=True)
+                return Response({"message": "Success", "data": serializer.data}, status=200)
+            except CourseDetails.DoesNotExist:
+                return Response({"message": "Invalid category"}, status=400)
+
+
+class GetStudentCourseDetails(APIView):
+    def get(self, request, category_id=None):
+        courses = Course.objects.all()
+        if request.user.is_authenticated:
+            if Student.objects.filter(user=request.user).exists():
+                courses = Course.objects.filter(is_deleted=False, id__in=list(
+                    StudentCourse.objects.filter(student__user=request.user).values_list('course', flat=True)))
+        if category_id is None:
+            course_details = CourseDetails.objects.filter(
+                is_deleted=False, course__in=courses)
+            serializer = CourseDetailsGet(course_details, many=True)
+            return Response({"message": "Success", "data": serializer.data}, status=200)
+        else:
+            try:
+                course_detail = CourseDetails.objects.filter(
+                    category=category_id, is_deleted=False).filter(course__in=courses)
                 serializer = CourseDetailsGet(course_detail, many=True)
                 return Response({"message": "Success", "data": serializer.data}, status=200)
             except CourseDetails.DoesNotExist:
