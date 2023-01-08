@@ -26,7 +26,7 @@ function AdminDashBoard(props) {
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editCourse, setEditCourse] = useState(null);
-  const [updated, setUpdated] = useState(false)
+  const [updated, setUpdated] = useState(false);
 
   function handleEditClose() {
     setShowEditModal(false);
@@ -149,7 +149,14 @@ function AdminDashBoard(props) {
                   <div className="cardView m-0">
                     <h5 onClick={() => redirectToTemplate(course.id)}>{course.title}</h5>
                     <ul className="coach-footer">
-                      <li className="cursorPointer" onClick={() => { setShowEditModal(true); setUpdated(false); setEditCourse(course) }}>
+                      <li
+                        className="cursorPointer"
+                        onClick={() => {
+                          setShowEditModal(true);
+                          setUpdated(false);
+                          setEditCourse(course);
+                        }}
+                      >
                         <i className="fa fa-pen" />
                         <span>Edit Course</span>
                       </li>
@@ -174,7 +181,7 @@ function AdminDashBoard(props) {
 
   function edone(item) {
     toast.success("Success: Course Details updated");
-    setUpdated(true)
+    setUpdated(true);
   }
 
   function CourseModal(props) {

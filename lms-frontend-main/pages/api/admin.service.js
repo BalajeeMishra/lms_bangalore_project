@@ -15,7 +15,7 @@ const addCourse = (courseData) => {
 
 const editCourse = (courseData) => {
   return api
-    .put(`/course_detail/${courseData['id']}`, {
+    .put(`/course_detail/${courseData["id"]}`, {
       ...courseData
     })
     .then((response) => {

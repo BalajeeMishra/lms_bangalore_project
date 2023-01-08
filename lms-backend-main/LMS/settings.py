@@ -243,7 +243,7 @@ AWS_SEC = "Dpp6xU/TBMEnGxySsRy94elyZNTEY9z7p4Ntyh9e"
 # prodution
 # BUCKET_NAME = "sambodhieducationnestss3"
 BUCKET_NAME = "lms-utilitie-bucket"
-S3_LINK = "https://lms-recordings.s3.ap-south-1.amazonaws.com/"
+S3_LINK = "https://lms-utilitie-bucket.s3.ap-south-1.amazonaws.com/"
 
 
 # HOST_URL = "http://lmsmle.educationnest.com"

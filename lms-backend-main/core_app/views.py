@@ -1371,3 +1371,39 @@ class MeetingAttendance(APIView):
 #             return Response({"message":"assignment questions is created"},status=200)
 #         else:
 #             return Response({"message":serializer.errors},status=400)
+
+
+class FeedbackViewSet (ModelViewSet):
+    """
+    API endpoint that lets you create, and retrieve feedback.
+    """
+    permission_classes = [IsAuthenticated]
+    serializer_class = FeedbackSerializer
+
+    def get_queryset(self):
+        """
+        Return a list of coupon.
+        """
+
+        qs_all = Feedback.objects.all()
+
+        for object in qs_all:
+            object.save()
+
+        if self.request.user.is_staff:
+            return qs_all
+
+        return qs_all
+
+    def create(self, request, **kwargs):
+        """
+        Create a feedback
+        """
+        request.data["user"] = self.request.user.id
+        serializer = FeedbackSerializer(
+            data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
