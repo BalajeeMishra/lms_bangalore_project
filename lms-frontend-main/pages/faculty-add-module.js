@@ -11,6 +11,7 @@ import GenericModal from "../src/components/GenericModal";
 import StudentService from "./api/student.service";
 import Card from "react-bootstrap/esm/Card";
 import Accordion from "react-bootstrap/esm/Accordion";
+import ModuleMaterialsView from "../src/components/ModuleMaterialView";
 
 const initialState = {
     course_title: "",
@@ -25,6 +26,7 @@ const AddModule = () => {
     const [deleteToggle, setDeleteToggle] = useState(false);
     const [isDelete, setIsDelete] = useState(false);
     const [showGenericModal, setShowGenericModal] = useState(false)
+    const [showGenericModuModal, setShowGenericModuModal] = useState(false)
     const [tabName, setTabName] = useState(null)
 
     const [input, setInput] = useState({
@@ -40,18 +42,28 @@ const AddModule = () => {
     const [courseId, setCourseCateogery] = useState();
     const [validation, setValidation] = useState(false);
     const [materials, setMaterials] = useState([]);
+    const [moduleMaterials, setModuleMaterials] = useState([]);
     const [isupdate, setIsupdate] = useState(false);
     useEffect(() => {
         const chunk = 4;
         StudentService.listCourseMaterial().then(res => {
             if (res && res.status === 200) {
-                splitIntoChunk(res.data.data, chunk, 'materials');
+                splitIntoChunk(res.data.data, chunk, 'materials', "course");
+            }
+        })
+    }, [])
+
+    useEffect(() => {
+        const chunk = 4;
+        StudentService.listModuleMaterial().then(res => {
+            if (res && res.status === 200) {
+                splitIntoChunk(res.data.data, chunk, 'materials', "module");
             }
         })
     }, [])
 
 
-    function splitIntoChunk(arr, chunk, type) {
+    function splitIntoChunk(arr, chunk, type, ent) {
         let allChunks = []
         for (let i = 0; i < arr.length; i += chunk) {
             let chunkArray;
@@ -59,7 +71,12 @@ const AddModule = () => {
             allChunks.push(chunkArray)
         }
         if (type === "materials") {
-            setMaterials(allChunks)
+            if (ent === "module") {
+                setModuleMaterials(allChunks)
+            }
+            else {
+                setMaterials(allChunks)
+            }
         }
 
     }
@@ -285,6 +302,12 @@ const AddModule = () => {
             course_List.push(<option key={element.id} value={element.id}>{element.title}</option>)
         });
     }
+    let module_List_ = [];
+    if (moduleList) {
+        moduleList.forEach(element => {
+            module_List_.push(<option key={element.id} value={element.id}>{element.title}</option>)
+        });
+    }
 
     let course_mods = []
     if (mod_list && courseList) {
@@ -327,12 +350,12 @@ const AddModule = () => {
             return
         }
         function Content() {
-            const [module, SetModule] = useState("")
+            const [course, SetCourse] = useState("")
             const [courseMaterial, SetCourseMaterial] = useState("")
             // const baseUrl = api.defaults.baseURL +"/material?key="+ props.urlKey;
             // console.log("baseUrl", baseUrl)
-            function handleChangeModule(e) {
-                if (e && e.target.value) SetModule(e.target.value)
+            function handleChangeCourse(e) {
+                if (e && e.target.value) SetCourse(e.target.value)
             }
             function handleChangeFile(e) {
                 if (e && e.target.files && e.target.files[0]) SetCourseMaterial(e.target.files[0])
@@ -342,7 +365,7 @@ const AddModule = () => {
                 let formData = new FormData();
                 formData.append("file", courseMaterial);
                 let md = {
-                    "course_id": module,
+                    "course_id": course,
                     formdata: formData
                 }
                 FacultyService.uploadCourse(md).then(res => {
@@ -352,7 +375,7 @@ const AddModule = () => {
                         const chunk = 4;
                         StudentService.listCourseMaterial().then(res => {
                             if (res && res.status === 200) {
-                                splitIntoChunk(res.data.data, chunk, 'materials');
+                                splitIntoChunk(res.data.data, chunk, 'materials', "course");
                             }
                         })
                     } else {
@@ -370,13 +393,13 @@ const AddModule = () => {
                                     <div className="col-sm-4 col-md-4">
                                         <input id="quiz_vid" type="text" className="form-control" placeholder="Video URL" />
                                     </div> */}
-                        <label className="col-sm-3 col-form-label form-label">Select Module</label>
+                        <label className="col-sm-3 col-form-label form-label">Select Course</label>
                         <div className="col-sm-9 col-md-9">
                             <select
-                                id="select_Module"
-                                name="select_Module"
-                                value={module}
-                                onChange={handleChangeModule}
+                                id="select_Course"
+                                name="select_Course"
+                                value={course}
+                                onChange={handleChangeCourse}
                                 className="form-select">
                                 <option value="">Select Course</option>
                                 {course_List}
@@ -411,6 +434,99 @@ const AddModule = () => {
             </div>
         )
     }
+
+    function ShowListMod() {
+        if (tabName !== 'Module Materials') {
+            return
+        }
+        function Content() {
+            const [module, setModule] = useState("")
+            const [moduleMaterial, setModuleMaterial] = useState("")
+            // const baseUrl = api.defaults.baseURL +"/material?key="+ props.urlKey;
+            // console.log("baseUrl", baseUrl)
+            function handleChangeModule(e) {
+                if (e && e.target.value) setModule(e.target.value)
+            }
+            function handleChangeFile(e) {
+                if (e && e.target.files && e.target.files[0]) setModuleMaterial(e.target.files[0])
+            }
+            function uploadMM() {
+                // console.log("module", module)
+                let formData = new FormData();
+                formData.append("file", moduleMaterial);
+                let md = {
+                    "module_id": module,
+                    formdata: formData
+                }
+                FacultyService.uploadModule(md).then(res => {
+                    setShowGenericModuModal(false)
+                    if (res && res.status === 200) {
+                        toast.success("Success: Module Material Uploaded");
+                        const chunk = 4;
+                        StudentService.listModuleMaterial().then(res => {
+                            if (res && res.status === 200) {
+                                splitIntoChunk(res.data.data, chunk, 'materials', "module");
+                            }
+                        })
+                    } else {
+                        toast.error("Module Material failed Uploading");
+                    }
+                }).catch(err => {
+                    toast.error("Module Material failed Uploading");
+                    console.log('err = ', err)
+                })
+            }
+            return (
+                <>
+                    <div className="form-group row">
+                        {/* <label for="quiz_desc" className="col-sm-2 col-form-label form-label">Video URL:</label>
+                                    <div className="col-sm-4 col-md-4">
+                                        <input id="quiz_vid" type="text" className="form-control" placeholder="Video URL" />
+                                    </div> */}
+                        <label className="col-sm-3 col-form-label form-label">Select Module</label>
+                        <div className="col-sm-9 col-md-9">
+                            <select
+                                id="select_Module"
+                                name="select_Module"
+                                value={module}
+                                onChange={handleChangeModule}
+                                className="form-select">
+                                <option value="">Select Module</option>
+                                {module_List_}
+                            </select>
+                        </div>
+                    </div>
+                    {isupdate ? <></> :
+                        <div className="form-group row">
+                            <label className="col-sm-3 col-form-label form-label">Course material</label>
+                            <div className="col-sm-9 col-md-9">
+                                <Form.Group controlId="formFileLg" className="mb-3">
+                                    {/* <Form.Label>Large file input example</Form.Label> */}
+
+                                    <input onChange={handleChangeFile} type="file" size="lg" name="course_material" />
+                                </Form.Group>
+                            </div>
+                        </div>
+                    }
+                    <div className="col-lg-12 mb-4 p-0">
+                        <button type="submit" className="btn btn-success" onClick={() => { uploadMM() }}>Upload</button>
+                    </div>
+                </>
+            )
+        }
+        return (
+            <div className="content">
+                <div className="col-lg-12 mb-4 p-0">
+                    <button type="submit" className="btn btn-success" onClick={() => { setShowGenericModuModal(true) }}>+ Add Module Material</button>
+                </div>
+                {showGenericModuModal && <GenericModal xl={false} hideClose={true} setShowModal={setShowGenericModuModal} showModal={showGenericModuModal} header={"Module Material"} content={<Content />} />}
+                <ModuleMaterialsView materials={moduleMaterials} />
+            </div>
+        )
+    }
+
+
+
     return (
         <FacLayout>
             <p className='title-db'>HOME / MODULE / COURSE MATERIALS</p>
@@ -527,7 +643,7 @@ const AddModule = () => {
                     <ToastContainer autoClose={2000} />
                     <div className="col-lg-12">
                         <div className="bg-layout wow fadeInUp delay-0-2s" >
-                            <TabLayout tab1={<ModuleTab />} tabName1={'Add Module'} tab2={<ShowList />} tabName2={'Course Materials'} setTabName={setTabName} />
+                            <TabLayout tab1={<ModuleTab />} tabName1={'Add Module'} tab3={<ShowList />} tabName3={'Course Materials'} tab2={<ShowListMod />} tabName2={'Module Materials'} setTabName={setTabName} />
                             {/* <AddAssign/> */}
                         </div>
                     </div>

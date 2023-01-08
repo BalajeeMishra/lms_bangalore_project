@@ -5,7 +5,7 @@ from rest_framework import routers
 
 router = routers.DefaultRouter(trailing_slash=False)
 router.register(r'video', VideoViewSet, basename='video')
-router.register('module',ModuleViewSet, basename="module")
+router.register('module', ModuleViewSet, basename="module")
 
 urlpatterns = [
     path('login', signin.as_view(), name='login'),
@@ -47,6 +47,13 @@ urlpatterns = [
          StudentAssignmentMaterialList.as_view(), name="assignment_material_list"),
     path("student_course_material_list",
          StudentCourseMaterialList.as_view(), name="assignment_course_list"),
+
+    path("upload_module_material/<str:module_id>",
+         ModuleMatrialFileUpload.as_view(), name="module_post_by_id"),
+    path("get_module_material/<str:module_id>",
+         ModuleMatrialFileUpload.as_view(), name="module_get_by_id"),
+    path("student_module_material_list",
+         StudentModuleMaterialList.as_view(), name="student_module_list"),
 
     path("upload_assignment_material/<str:assignment_id>",
          AssignmentMatrialFileUpload.as_view(), name="assignment_get_by_id"),

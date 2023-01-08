@@ -887,6 +887,103 @@ class CourseMatrialFileUpload(APIView):
             return Response({"status": status.HTTP_404_NOT_FOUND, "message": "Course doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
 
 
+class StudentCourseMaterialList(APIView):
+
+    def get(self, request):
+        try:
+            try:
+                stu = get_object_or_404(Student, user_id=request.user.id)
+                course_material = CourseMaterial.objects.filter(
+                    course__in=list(Course.objects.filter(is_deleted=False, id__in=list(StudentCourse.objects.filter(student=stu.id).values_list("course", flat=True))).values_list("id", flat=True)))
+            except Exception:
+                teacher = get_object_or_404(Teacher, user_id=request.user.id)
+                course_material = CourseMaterial.objects.filter(course__in=list(
+                    Course.objects.filter(is_deleted=False, teacher__id=teacher.id)))
+            unique_course = dict()
+            for material in course_material:
+                url = material.material_url.split('/')
+                url.pop()
+                course_id = url.pop()
+                prefix_path = "/".join(url)+"/"
+                files_list = get_assessment_files(prefix_path, course_id)
+                if material.course.title not in unique_course:
+                    unique_course[material.course.title] = files_list
+
+            files_list_ = [{"course_name": key, "file_list": value}
+                           for key, value in unique_course.items()]
+            return Response({"message": "success", "data": files_list_}, status=200)
+        except Assignment.DoesNotExist:
+            return Response({"message": "Assignment Material list is empty "}, status=204)
+
+
+class ModuleMatrialFileUpload(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, module_id=None, format=None):
+        module_obj = Module.objects.get(id=module_id)
+        files_list = get_assessment_files(
+            f'Material/Module/{module_obj.course.id}/', module_id)
+        return Response({"message": "Success", "list": files_list}, status=200)
+
+    def post(self, request, material_type=None, module_id=None, format=None):
+        if module_id is None:
+            return Response({"message": "module id is required"}, status=400)
+        try:
+            module_obj = Module.objects.get(id=int(module_id))
+
+            files = request.FILES['file']
+            file_name = str(int(time.time()) * 1000)+"_"+files.name
+            file_path = 'Material/Module/%s/%s/%s' % (
+                module_obj.course.id, module_id, file_name)
+
+            upload_status = upload_assessment_file(files, file_path)
+            if upload_status:
+                if not ModuleMaterial.objects.filter(
+                    module=module_obj,
+                    material_url=file_path
+                ).exists():
+                    module_material = ModuleMaterial(
+                        module=module_obj,
+                        material_url=file_path
+                    )
+                module_material.save()
+                return Response({"message": "File Uploaded Successfully", "path": file_path}, status=200)
+            else:
+                return Response({"message": "Failed to upload"}, status=400)
+        except Course.DoesNotExist:
+            return Response({"status": status.HTTP_404_NOT_FOUND, "message": "Module doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
+
+
+class StudentModuleMaterialList(APIView):
+
+    def get(self, request):
+        try:
+            try:
+                stu = get_object_or_404(Student, user_id=request.user.id)
+                module_material = ModuleMaterial.objects.filter(
+                    module__in=list(Module.objects.filter(is_deleted=False, id__in=list(Course.objects.filter(is_deleted=False, id__in=list(
+                        StudentCourse.objects.filter(student=stu.id).values_list("course", flat=True))).values_list("id", flat=True)))))
+            except Exception:
+                teacher = get_object_or_404(Teacher, user_id=request.user.id)
+                module_material = ModuleMaterial.objects.filter(module__in=list(
+                    Module.objects.filter(is_deleted=False, teacher__id=teacher.id)))
+            unique_module = dict()
+            for material in module_material:
+                url = material.material_url.split('/')
+                url.pop()
+                module_id = url.pop()
+                prefix_path = "/".join(url)+"/"
+                files_list = get_assessment_files(prefix_path, module_id)
+                if material.module.title not in unique_module:
+                    unique_module[material.module.title] = files_list
+
+            files_list_ = [{"module_name": key, "file_list": value}
+                           for key, value in unique_module.items()]
+            return Response({"message": "success", "data": files_list_}, status=200)
+        except Assignment.DoesNotExist:
+            return Response({"message": "Assignment Material list is empty "}, status=204)
+
+
 class AssignmentMatrialFileUpload(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -1061,35 +1158,6 @@ class ZoomMeeting(APIView):
             return Response({"message": "Success", "files_list": files_list}, status=200)
 
 
-class StudentCourseMaterialList(APIView):
-
-    def get(self, request):
-        try:
-            try:
-                stu = get_object_or_404(Student, user_id=request.user.id)
-                course_material = CourseMaterial.objects.filter(
-                    course__in=list(Course.objects.filter(is_deleted=False, id__in=list(StudentCourse.objects.filter(student=stu.id).values_list("course", flat=True))).values_list("id", flat=True)))
-            except Exception:
-                teacher = get_object_or_404(Teacher, user_id=request.user.id)
-                course_material = CourseMaterial.objects.filter(course__in=list(
-                    Course.objects.filter(is_deleted=False, teacher__id=teacher.id)))
-            unique_course = dict()
-            for material in course_material:
-                url = material.material_url.split('/')
-                url.pop()
-                course_id = url.pop()
-                prefix_path = "/".join(url)+"/"
-                files_list = get_assessment_files(prefix_path, course_id)
-                if material.course.title not in unique_course:
-                    unique_course[material.course.title] = files_list
-
-            files_list_ = [{"course_name": key, "file_list": value}
-                           for key, value in unique_course.items()]
-            return Response({"message": "success", "data": files_list_}, status=200)
-        except Assignment.DoesNotExist:
-            return Response({"message": "Assignment Material list is empty "}, status=204)
-
-
 # @api_view(["POST"])
 # @renderer_classes((TemplateHTMLRenderer, JSONRenderer))
 def store_recording(request):
@@ -1113,7 +1181,7 @@ def store_recording(request):
             return Response({"message": "Recording could not be uploaded to aws storage"}, status=400)
 
 
-@api_view(['POST',])
+@ api_view(['POST',])
 def store_recording_video(request):
     files = request.FILES['file']
     file_name = f"./Videos/{files.name}"

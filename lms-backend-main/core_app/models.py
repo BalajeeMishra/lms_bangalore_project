@@ -60,6 +60,16 @@ class CourseMaterial(models.Model):
     def __str__(self):
         return self.course.title
 
+
+class ModuleMaterial(models.Model):
+    module = models.ForeignKey(
+        Module, on_delete=models.CASCADE, related_name='module_material')
+    material_url = models.TextField()
+    add_time = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.course.title
+
 # Quiz Model
 
 

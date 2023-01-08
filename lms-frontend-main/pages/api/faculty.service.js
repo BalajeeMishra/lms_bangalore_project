@@ -276,6 +276,23 @@ const uploadCourse = (data) => {
     });
 };
 
+const uploadModule = (data) => {
+  console.log("data", data);
+  let path = "/upload_module_material/" + data.module_id;
+  return api
+    .post(path, data.formdata, {
+      headers: {
+        "Content-Type": "multipart/form-data"
+      }
+    })
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      return error.response;
+    });
+};
+
 const uploadAssignemnt = (data) => {
   // console.log("data", data)
   let path = "/upload_assignment_material/" + data.assignment_id;
@@ -394,7 +411,8 @@ const FacultyService = {
   addModule,
   listModule,
   updateModule,
-  deleteModule
+  deleteModule,
+  uploadModule
 };
 
 export default FacultyService;
