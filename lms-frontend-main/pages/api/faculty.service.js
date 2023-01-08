@@ -45,6 +45,17 @@ const listModule = () => {
     });
 };
 
+const getModules = (course) => {
+  return api
+    .get("/module?course=" + course)
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      return error.response;
+    });
+};
+
 const updateCourse = (courseData, id) => {
   return api
     .put("/add_course/" + id, {
@@ -116,6 +127,31 @@ const addQuiz = (quizData) => {
 const updateQuiz = (quizData, id) => {
   return api
     .put("/add_quiz/" + id, {
+      quizData
+    })
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      return error.response;
+    });
+};
+const addModuleQuiz = (quizData) => {
+  return api
+    .post("/add_module_quiz", {
+      quizData
+    })
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      return error.response;
+    });
+};
+
+const updateModuleQuiz = (quizData, id) => {
+  return api
+    .put("/add_module_quiz/" + id, {
       quizData
     })
     .then((response) => {
@@ -409,7 +445,10 @@ const FacultyService = {
   listModule,
   updateModule,
   deleteModule,
-  uploadModule
+  uploadModule,
+  getModules,
+  addModuleQuiz,
+  updateModuleQuiz
 };
 
 export default FacultyService;

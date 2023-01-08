@@ -10,7 +10,7 @@ import Modal from "../src/components/modal/Modal";
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 const initialState = {
-    course_id: "",
+    module_id: "",
     question: "",
     assignment_title: "",
     assignment_material: ""
@@ -27,7 +27,7 @@ const columns = [
         text: "Title"
     },
     // {
-    //     dataField: "course",
+    //     dataField: "module",
     //     text: "Module"
     // },
     {
@@ -38,13 +38,12 @@ const columns = [
         dataField: "action",
         text: "Action"
     }
-    
+
 ];
 
-function AddAssignment(){
+function AddAssignment() {
     const [error, setError] = useState("");
-    const [courseList, setCourseList] = useState();
-    const [courseCateogery, setCourseCateogery] = useState();
+    const [moduleList, setModuleList] = useState();
     const [assignmentList, setAssignmentList] = useState([]);
     const [validation, setValidation] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
@@ -53,7 +52,7 @@ function AddAssignment(){
     const [key, setKey] = useState("Add Assignment");
 
     const [input, setInput] = useState({
-        course_id: "",
+        module_id: "",
         question: "",
         assignment_title: "",
         assignment_material: null,
@@ -84,16 +83,16 @@ function AddAssignment(){
     };
     const submitAssignment = e => {
         e.preventDefault()
-        let { course_id, question, assignment_title, assignment_material, id } = input;
+        let { module_id, question, assignment_title, assignment_material, id } = input;
         let validation_ = false;
-        let course_data = {
+        let moule_data = {
             "title": assignment_title,
             "question": question,
-            "course": course_id,
+            "module": module_id,
             "id": id
         }
 
-        if (!course_id) {
+        if (!module_id) {
             setError("Assignment Title should not be blank")
             setValidation(true)
             validation_ = true
@@ -102,7 +101,7 @@ function AddAssignment(){
             setValidation(true)
             validation_ = true
         } else if (!question) {
-            setError("Select course should not be blank")
+            setError("Select module should not be blank")
             setValidation(true)
             validation_ = true
         }
@@ -112,27 +111,27 @@ function AddAssignment(){
                 if (res.status == 200) {
                     setError("")
                     toast.success("Success: Quiz question deleted");
-                    FacultyService.listAssignment().then(res =>{
+                    FacultyService.listAssignment().then(res => {
                         if (res && res.data && res.data.data) {
-                        setAssignmentList(res.data.data)
-                        setInput({ ...initialState });
+                            setAssignmentList(res.data.data)
+                            setInput({ ...initialState });
                         }
-                    }) 
+                    })
                 } else {
                     setError(res.data.message);
                     setInput({ ...initialState });
                 }
             })
-            .catch(err => {
-                setError(err);
-            });
+                .catch(err => {
+                    setError(err);
+                });
             setIsDeleteOpen(false)
             return
         }
 
         if (validation_ == false) {
             if (!isEditOpen && !isDeleteOpen) {
-                FacultyService.addAssignment(course_data).then(res => {
+                FacultyService.addAssignment(moule_data).then(res => {
                     if (res.status == 200) {
                         setError("")
                         setInput({ ...initialState });
@@ -144,7 +143,7 @@ function AddAssignment(){
                             "assignment_id": assignmentId,
                             formdata: formData
                         }
-                        if(assignment_material?.type !== undefined){
+                        if (assignment_material?.type !== undefined) {
                             FacultyService.uploadAssignemnt(file_data).then(res => {
                                 console.log("uploaded res", res)
                             }).catch(err => {
@@ -153,7 +152,7 @@ function AddAssignment(){
                         }
 
                         FacultyService.listAssignment().then(res => {
-                            if(res && res.status === 200){
+                            if (res && res.status === 200) {
                                 setAssignmentList(res.data.data)
                             }
                         })
@@ -163,90 +162,83 @@ function AddAssignment(){
                         }
                     }
                 })
-                .catch(err => {
-                    setError(err);
-                });
+                    .catch(err => {
+                        setError(err);
+                    });
             }
-            else if (isEditOpen  && !isDeleteOpen) {
-                FacultyService.updateAssignment(course_data, id).then(res => {
-                    console.log("updateQuizQuestion",res)
+            else if (isEditOpen && !isDeleteOpen) {
+                FacultyService.updateAssignment(moule_data, id).then(res => {
+                    console.log("updateQuizQuestion", res)
                     if (res.status == 200) {
                         // setError("")
                         toast.success("Success: Quiz question updated");
-                        FacultyService.listAssignment().then(res =>{
+                        FacultyService.listAssignment().then(res => {
                             if (res && res.data && res.data.data) {
                                 setAssignmentList(res.data.data)
                                 setInput({ ...initialState });
                             }
-                        }) 
+                        })
                     } else {
                         setError(res.data.message);
                         setInput({ ...initialState });
                     }
                 })
-                .catch(err => {
-                    setError(err);
-                });
+                    .catch(err => {
+                        setError(err);
+                    });
                 setIsEditOpen(false)
-            } 
+            }
         }
     }
 
-   
+
     useEffect(() => {
         // Your code here
-        FacultyService.listCourse().then(res => {
-            if (res && res.data && res.data.data) {
-            setCourseList(res.data.data)
-            }
-        })
-
-        FacultyService.getCourseCateogery().then(res => {
-            if (res && res.data && res.data.data) {
-                setCourseCateogery(res.data.data)
+        FacultyService.listModule().then(res => {
+            if (res && res.data) {
+                setModuleList(res.data)
             }
         })
 
         FacultyService.listAssignment().then(res => {
-            if(res && res.status === 200){
-                // console.log("resdata", res.data.data)
+            if (res && res.status === 200) {
                 setAssignmentList(res.data.data)
             }
         })
     }, []);
 
- 
 
-    let course_list_ = [];
-    if (courseList) {
-        courseList.forEach(element => {
-            course_list_.push(<option key={element.id} value={element.id}>{element.title}</option>)
+
+    let module_list_ = [];
+    if (moduleList) {
+        moduleList.forEach(element => {
+            module_list_.push(<option key={element.id} value={element.id}>{element.title}</option>)
         });
     }
 
     let assignment_list_ = [];
     let action = null;
-    if (assignmentList){
-        assignmentList.map((element,idx) => {
+    if (assignmentList) {
+        assignmentList.map((element, idx) => {
             action = <>
-                   
-            <button onClick={()=>{ handleEditAssignment(element);}} className="btn btn-default btn-sm float-right">
-            <i className="fas fa-edit"></i> Edit 
-            </button>
-            <button onClick={()=>{ handleDeleteAssignment(element);}} className="btn btn-default btn-sm float-right">
-            <i className="fas fa-trash"></i> Delete 
-            </button>
+
+                <button onClick={() => { handleEditAssignment(element); }} className="btn btn-default btn-sm float-right">
+                    <i className="fas fa-edit"></i> Edit
+                </button>
+                <button onClick={() => { handleDeleteAssignment(element); }} className="btn btn-default btn-sm float-right">
+                    <i className="fas fa-trash"></i> Delete
+                </button>
             </>,
-            element['action'] = action,
-            assignment_list_.push(
-                {
-                    slno: idx+1,
-                    title: element.title,
-                    // course: element.course,
-                    question: element.question,
-                    action: element.action
-                }
-            )        
+                element['action'] = action,
+                assignment_list_.push(
+                    {
+                        slno: idx + 1,
+                        title: element.title,
+                        // module: element.module,
+                        question: element.question,
+                        action: element.action
+                    }
+                )
         });
     }
 
@@ -255,7 +247,7 @@ function AddAssignment(){
         setError("")
         setInput(
             {
-                course_id: ele.course,
+                module_id: ele.module,
                 question: ele.question,
                 assignment_title: ele.title,
                 id: ele.id
@@ -311,12 +303,12 @@ function AddAssignment(){
                                                         <select
                                                             id="quizId"
                                                             defaultValue=""
-                                                            name="course_id"
-                                                            value={input.course_id}
+                                                            name="module_id"
+                                                            value={input.module_id}
                                                             onChange={handleChange}
                                                             className="form-select">
                                                             <option value="">Select Module</option>
-                                                            {course_list_}
+                                                            {module_list_}
                                                         </select>
                                                     </div>
                                                 </div>
@@ -360,61 +352,61 @@ function AddAssignment(){
             </div>
 
             {isEditOpen &&
-            <div className="container assignMentModel">
-            <Modal title="Update Assignment" toggle={isEditOpen} onClose={() => { setIsEditOpen(false); setInput({ ...initialState });}} style={{height: 'auto'}}>
-                <div className="content py-3">
-                    <span className='err text-center'>{error}</span>
-                    <form onSubmit={submitAssignment} autoComplete="off">
-                    <div className="col-md-12">
-                        <div className="form-group row">
-                            <label className="col-sm-3 col-form-label form-label">Assignment Title:</label>
-                            <div className="col-sm-4 col-md-4">
-                                <input id="quiz_title"
-                                    name="assignment_title"
-                                    value={input.assignment_title}
-                                    onChange={handleChange}
-                                    type="text"
-                                    className="form-control"
-                                    placeholder="Title"
-                                />
-                            </div>
+                <div className="container assignMentModel">
+                    <Modal title="Update Assignment" toggle={isEditOpen} onClose={() => { setIsEditOpen(false); setInput({ ...initialState }); }} style={{ height: 'auto' }}>
+                        <div className="content py-3">
+                            <span className='err text-center'>{error}</span>
+                            <form onSubmit={submitAssignment} autoComplete="off">
+                                <div className="col-md-12">
+                                    <div className="form-group row">
+                                        <label className="col-sm-3 col-form-label form-label">Assignment Title:</label>
+                                        <div className="col-sm-4 col-md-4">
+                                            <input id="quiz_title"
+                                                name="assignment_title"
+                                                value={input.assignment_title}
+                                                onChange={handleChange}
+                                                type="text"
+                                                className="form-control"
+                                                placeholder="Title"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="form-group row">
+                                        <label className="col-sm-3 col-form-label form-label">Select Module</label>
+                                        <div className="col-sm-4">
+                                            <select
+                                                id="quizId"
+                                                defaultValue=""
+                                                name="module_id"
+                                                value={input.module_id}
+                                                onChange={handleChange}
+                                                className="form-select">
+                                                <option value="">Select Module</option>
+                                                {module_list_}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-md-12">
+                                    <div className="form-group ">
+                                        <label>Enter your question</label>
+                                        <textarea className="form-control" id="question"
+                                            name="question"
+                                            value={input.question}
+                                            onChange={handleChange}
+                                            rows="3"></textarea>
+                                    </div>
+                                </div>
+
+                                <div className="col-md-3">
+                                    <div className="form-group ">
+                                        <button type="submit" className="btn btn-success">Save</button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
-                        <div className="form-group row">
-                            <label className="col-sm-3 col-form-label form-label">Select Module</label>
-                            <div className="col-sm-4">
-                                <select
-                                    id="quizId"
-                                    defaultValue=""
-                                    name="course_id"
-                                    value={input.course_id}
-                                    onChange={handleChange}
-                                    className="form-select">
-                                    <option value="">Select Module</option>
-                                    {course_list_}
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="col-md-12">
-                        <div className="form-group ">
-                            <label>Enter your question</label>
-                            <textarea className="form-control" id="question"
-                                name="question"
-                                value={input.question}
-                                onChange={handleChange}
-                                rows="3"></textarea>
-                        </div>
-                    </div>
-                    
-                    <div className="col-md-3">
-                        <div className="form-group ">
-                            <button type="submit" className="btn btn-success">Save</button>
-                        </div>
-                    </div>
-                </form>
+                    </Modal>
                 </div>
-            </Modal>
-            </div>
             }
 
             {(isDeleteOpen) &&
@@ -438,7 +430,7 @@ function AddAssignment(){
                             </div>
                         </form>
                     </Modal>
-            </div>
+                </div>
             }
         </FacLayout>
     )
@@ -450,8 +442,8 @@ function AddAssignment(){
                     <label className="col-form-label form-label"> Looks like Assignment list is empty, start adding assignments</label>
                 }
                 <hr />
-                {assignment_list_.length > 0 && 
-                    <PaginationTable  data={assignment_list_} columns={columns} />
+                {assignment_list_.length > 0 &&
+                    <PaginationTable data={assignment_list_} columns={columns} />
                 }
             </div>
         )

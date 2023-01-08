@@ -18,7 +18,19 @@ function CourseMaterials() {
     });
   }, []);
 
-  useEffect(() => {}, [materials]);
+
+  useEffect(() => {
+    const chunk = 4;
+    StudentService.listModuleMaterial().then(res => {
+      if (res && res.status === 200) {
+        console.log(res.data.data)
+        splitIntoChunk(res.data.data, chunk, "module");
+      }
+    })
+  }, [])
+
+
+  useEffect(() => { }, [materials]);
 
   function splitIntoChunk(arr, chunk) {
     let allChunks = [];

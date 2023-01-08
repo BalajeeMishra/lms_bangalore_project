@@ -1,6 +1,8 @@
 from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from core_app.serializers import *
 from core_app.models import *
@@ -250,6 +252,27 @@ class AddModuleQuiz(APIView):
         else:
             return Response({'message': 'Empty payload !'}, status=400)
 
+    def put(self, request, quiz_id=None):
+        # if serializer.data:
+        # return Response({"data":serializer.data},status=200)
+        try:
+            # course = Course.objects.get(id=course_id,is_deleted=False)
+            quiz = Quiz.objects.get(id=quiz_id, is_deleted=False)
+
+            if quiz:
+                serializer = QuizSerializer(
+                    quiz, data=request.data['quizData'], partial=True)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response({"message": "Updated Successfully", "data": serializer.data})
+                else:
+                    return Response({"message": "Invalid Data"}, status=400)
+            else:
+                return Response({"message": "Invalid Quiz ID"}, status=400)
+
+        except Exception as e:
+            return Response({"message": "Something went wrong!!", "error": e}, status=500)
+
 
 class AddQuizQuestions(APIView):
     permission_classes = [IsAuthenticated]
@@ -431,24 +454,16 @@ class AddCourse(APIView):
 class ModuleViewSet(ModelViewSet):
     serializer_class = ModuleSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    filterset_fields = ['course']
+    search_fields = ('=course')
+
+    queryset = Module.objects.all()
 
     def get_queryset(self):
-        """
-        Return all modules
-        """
-        qs = Module.objects.all()
-        return qs
-
-    def list(self, request, *args, **kwargs):
-        """
-        Return list of all modules
-        """
-        teacher = get_object_or_404(Teacher, user_id=request.user.id)
-        qs = Module.objects.filter(teacher=teacher.id)
-        if "course_id" in request.data:
-            qs = qs.filter(course__id=request.data['course_id'])
-        serializer = ModuleSerializer(qs, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        if Teacher.objects.filter(user=self.request.user).exists():
+            return Module.objects.filter(teacher=get_object_or_404(Teacher, user=self.request.user))
+        return super().get_queryset()
 
     def create(self, request, *args, **kwargs):
         """
@@ -500,12 +515,12 @@ class AddAssignment(APIView):
                                 status=200)
 
             teacher_obj = Teacher.objects.get(user_id=user.id)
-            course_obj = Course.objects.get(
-                id=serializer.validated_data['course'])
+            module = Module.objects.get(
+                id=serializer.validated_data['module'])
 
             assignment = Assignment(
                 teacher=teacher_obj,
-                course=course_obj,
+                module=module,
                 title=serializer.validated_data['title'],
                 question=serializer.validated_data['question']
             )
@@ -815,8 +830,9 @@ class StudendAssignmentList(APIView):
 
     def get(self, request):
         student_assignment_data = []
-        assignments = Assignment.objects.filter(is_deleted=False, course__in=Course.objects.filter(
-            is_deleted=False, id__in=StudentCourse.objects.filter(student=request.user.id)))
+        student = Student.objects.get(user=request.user)
+        assignments = Assignment.objects.filter(
+            is_deleted=False, module__course__in=list(StudentCourse.objects.filter(student=student).values_list('course', flat=True)))
         for assignment in assignments:
             id = assignment.id
             teacher = assignment.teacher
@@ -833,7 +849,7 @@ class StudendAssignmentList(APIView):
             student_assignment_data.append(
                 {
                     "teacher": teacher.user.id,
-                    "course": "",
+                    "module": "",
                     "title": assignment.title,
                     "id": assignment.id,
                     "question": assignment.question,
@@ -1064,9 +1080,9 @@ class AssignmentMatrialFileUpload(APIView):
 class StudentAssignmentMaterialList(APIView):
     def get(self, request):
         try:
-            course_material = AssignmentMaterial.objects.all()
+            module_material = AssignmentMaterial.objects.all()
             files_list_ = []
-            for material in course_material:
+            for material in module_material:
                 url = material.material_url.split('/')
                 url.pop()
                 course_id = url.pop()
@@ -1136,7 +1152,7 @@ class StudentUploadedAssignmentList(APIView):
 
     def get(self, request):
         try:
-            files_list_ = []
+            files_list_ = []    
             assignments = Assignment.objects.filter(
                 teacher__user_id=request.user.id)
             # assignments = Assignment.objects.all()
