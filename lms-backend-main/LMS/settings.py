@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_filters',
     'rest_framework',
     'core_app',
     'authentication',
@@ -99,8 +100,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'lms_prod',
         'USER': 'postgres',
-        'PASSWORD': 'Balajee123',
-        # 'PASSWORD': 'abc123',
+        # 'PASSWORD': 'Balajee123',
+        'PASSWORD': 'abc123',
         # 'PASSWORD': 'CaprA4rEgEbRUtrIxAch',
         # 'HOST': '3.111.73.127',
         # 'HOST': 'localhost',
@@ -135,6 +136,7 @@ REST_FRAMEWORK = {
     #     # 'rest_framework.permissions.AllowAny',
     #     'rest_framework.permissions.IsAdminUser'
     # ],
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],

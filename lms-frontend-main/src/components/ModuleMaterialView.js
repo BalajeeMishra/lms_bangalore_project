@@ -4,7 +4,7 @@ import GenericModal from "./GenericModal";
 import api from "../../pages/api/api"
 import Accordion from 'react-bootstrap/Accordion';
 
-function CourseMaterialsView(props) {
+function ModuleMaterialsView(props) {
 
     const [showModal, setShowModal] = useState(false)
     const [docKey, setDocKey] = useState(null)
@@ -16,7 +16,7 @@ function CourseMaterialsView(props) {
     return (
         <>
             {props.materials.length === 0 &&
-                <label className="col-form-label form-label"> Looks like Course Materials list is empty, start adding Course Material</label>
+                <label className="col-form-label form-label"> Looks like Module Materials list is empty, start adding Module Material</label>
             }
             {props.materials.length > 0 && props.materials.map((uris, index) => {
                 return <CardViewDoc materials={uris} key={"key" + index} />
@@ -47,7 +47,7 @@ function CourseMaterialsView(props) {
                 {props.materials && props.materials.length > 0 && props.materials.map((url, idx) => (
                     <>
                         {props.materials[idx] && props.materials[idx].file_list.length > 0 &&
-                            <CardMap setDocKey={setDocKey} docKey={docKey} setShowModal={setShowModal} showModal={showModal} materials={props.materials[idx].file_list} cname={props.materials[idx].course_name} indx={idx} />
+                            <CardMap setDocKey={setDocKey} docKey={docKey} setShowModal={setShowModal} showModal={showModal} materials={props.materials[idx].file_list} cname={props.materials[idx].module_name} indx={idx} />
                         }
                     </>
 
@@ -68,7 +68,7 @@ function CourseMaterialsView(props) {
                 <Accordion defaultActiveKey="0">
                     <Card>
                         <Accordion.Toggle as={Card.Header} eventKey={props.indx.toString()} className="cursorPointer">
-                            Course Name: {props.cname}  <i className="fas fa-angle-down float-right"></i>
+                            Module Name: {props.cname}  <i className="fas fa-angle-down float-right"></i>
                         </Accordion.Toggle>
                         <Accordion.Collapse eventKey={props.indx.toString()}>
                             <Card.Body>
@@ -93,4 +93,4 @@ function CourseMaterialsView(props) {
 
 }
 
-export default CourseMaterialsView;
+export default ModuleMaterialsView;

@@ -60,6 +60,16 @@ class CourseMaterial(models.Model):
     def __str__(self):
         return self.course.title
 
+
+class ModuleMaterial(models.Model):
+    module = models.ForeignKey(
+        Module, on_delete=models.CASCADE, related_name='module_material')
+    material_url = models.TextField()
+    add_time = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.course.title
+
 # Quiz Model
 
 
@@ -115,7 +125,7 @@ class StudentCourseEnrollment(models.Model):
 class Assignment(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     # student = models.ForeignKey(Student,on_delete=models.CASCADE)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, null=True)
+    module = models.ForeignKey(Module, on_delete=models.CASCADE, null=True)
     title = models.CharField(max_length=200)
     question = models.TextField()
     # file_upload_url = models.CharField (max_length=800)
@@ -136,8 +146,8 @@ class AssignmentMaterial(models.Model):
 # class AssignmentQuestions(models.Model):
 
 
-class CourseAssignment(models.Model):
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, null=True)
+class ModuleAssignment(models.Model):
+    module = models.ForeignKey(Module, on_delete=models.CASCADE, null=True)
     assignment = models.ForeignKey(
         Assignment, on_delete=models.CASCADE, null=True)
     add_time = models.DateTimeField(auto_now_add=True)

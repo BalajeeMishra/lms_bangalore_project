@@ -1,6 +1,8 @@
 from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from core_app.serializers import *
 from core_app.models import *
@@ -216,6 +218,62 @@ class AddQuiz(APIView):
         #     return Response({"message":serializer.errors},status=400)
 
 
+class AddModuleQuiz(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+
+        data = None
+        if "quizData" in request.data:
+            data = request.data['quizData']
+        else:
+            data = request.data
+        if data:
+            teacher = Teacher.objects.get(user=user)
+            if teacher:
+                title = data['title']
+                detail = data['detail']
+                module_id = data['module_id']
+
+                teacher_obj = Teacher.objects.get(user_id=request.user.id)
+                module_obj = Module.objects.get(id=module_id)
+                if Quiz.objects.filter(teacher=teacher_obj, title=title, is_deleted=False).exists():
+                    return Response({'message': f'Quiz already present'}, status=200)
+
+                quiz = Quiz(teacher=teacher_obj, title=title, detail=detail)
+                quiz.save()
+
+                module_quiz = ModuleQuiz(module=module_obj, quiz=quiz)
+                module_quiz.save()
+                return Response({'message': f'Quiz saved for {teacher.user}'}, status=200)
+            else:
+                return Response({'message': f'Teacher not present'}, status=400)
+        else:
+            return Response({'message': 'Empty payload !'}, status=400)
+
+    def put(self, request, quiz_id=None):
+        # if serializer.data:
+        # return Response({"data":serializer.data},status=200)
+        try:
+            # course = Course.objects.get(id=course_id,is_deleted=False)
+            quiz = Quiz.objects.get(id=quiz_id, is_deleted=False)
+
+            if quiz:
+                serializer = QuizSerializer(
+                    quiz, data=request.data['quizData'], partial=True)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response({"message": "Updated Successfully", "data": serializer.data})
+                else:
+                    return Response({"message": "Invalid Data"}, status=400)
+            else:
+                return Response({"message": "Invalid Quiz ID"}, status=400)
+
+        except Exception as e:
+            return Response({"message": "Something went wrong!!", "error": e}, status=500)
+
+
 class AddQuizQuestions(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -396,24 +454,16 @@ class AddCourse(APIView):
 class ModuleViewSet(ModelViewSet):
     serializer_class = ModuleSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    filterset_fields = ['course']
+    search_fields = ('=course')
+
+    queryset = Module.objects.all()
 
     def get_queryset(self):
-        """
-        Return all modules
-        """
-        qs = Module.objects.all()
-        return qs
-
-    def list(self, request, *args, **kwargs):
-        """
-        Return list of all modules
-        """
-        teacher = get_object_or_404(Teacher, user_id=request.user.id)
-        qs = Module.objects.filter(teacher=teacher.id)
-        if "course_id" in request.data:
-            qs = qs.filter(course__id=request.data['course_id'])
-        serializer = ModuleSerializer(qs, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        if Teacher.objects.filter(user=self.request.user).exists():
+            return Module.objects.filter(teacher=get_object_or_404(Teacher, user=self.request.user))
+        return super().get_queryset()
 
     def create(self, request, *args, **kwargs):
         """
@@ -465,12 +515,12 @@ class AddAssignment(APIView):
                                 status=200)
 
             teacher_obj = Teacher.objects.get(user_id=user.id)
-            course_obj = Course.objects.get(
-                id=serializer.validated_data['course'])
+            module = Module.objects.get(
+                id=serializer.validated_data['module'])
 
             assignment = Assignment(
                 teacher=teacher_obj,
-                course=course_obj,
+                module=module,
                 title=serializer.validated_data['title'],
                 question=serializer.validated_data['question']
             )
@@ -710,9 +760,9 @@ class StudentQuizList(APIView):
 
     def get(self, request):
         student_obj = Student.objects.get(user_id=request.user.id)
-
-        users_quiz = Quiz.objects.filter(is_deleted=False, id__in=CourseQuiz.objects.filter(
-            course__in=Course.objects.filter(is_deleted=False, id__in=StudentCourse.objects.filter(student=request.user.id))))
+        users_quiz = Quiz.objects.filter(is_deleted=False, id__in=list(CourseQuiz.objects.filter(
+            course__in=list(Course.objects.filter(is_deleted=False, id__in=list(
+                StudentCourse.objects.filter(student__user=request.user).values_list('course', flat=True))).values_list('id', flat=True))).values_list('quiz', flat=True)))
 
         serializer = QuizSerializer(users_quiz, many=True)
         for idx, x in enumerate(serializer.data):
@@ -780,8 +830,9 @@ class StudendAssignmentList(APIView):
 
     def get(self, request):
         student_assignment_data = []
-        assignments = Assignment.objects.filter(is_deleted=False, course__in=Course.objects.filter(
-            is_deleted=False, id__in=StudentCourse.objects.filter(student=request.user.id)))
+        student = Student.objects.get(user=request.user)
+        assignments = Assignment.objects.filter(
+            is_deleted=False, module__course__in=list(StudentCourse.objects.filter(student=student).values_list('course', flat=True)))
         for assignment in assignments:
             id = assignment.id
             teacher = assignment.teacher
@@ -798,7 +849,7 @@ class StudendAssignmentList(APIView):
             student_assignment_data.append(
                 {
                     "teacher": teacher.user.id,
-                    "course": "",
+                    "module": "",
                     "title": assignment.title,
                     "id": assignment.id,
                     "question": assignment.question,
@@ -887,6 +938,103 @@ class CourseMatrialFileUpload(APIView):
             return Response({"status": status.HTTP_404_NOT_FOUND, "message": "Course doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
 
 
+class StudentCourseMaterialList(APIView):
+
+    def get(self, request):
+        try:
+            try:
+                stu = get_object_or_404(Student, user_id=request.user.id)
+                course_material = CourseMaterial.objects.filter(
+                    course__in=list(Course.objects.filter(is_deleted=False, id__in=list(StudentCourse.objects.filter(student=stu.id).values_list("course", flat=True))).values_list("id", flat=True)))
+            except Exception:
+                teacher = get_object_or_404(Teacher, user_id=request.user.id)
+                course_material = CourseMaterial.objects.filter(course__in=list(
+                    Course.objects.filter(is_deleted=False, teacher__id=teacher.id)))
+            unique_course = dict()
+            for material in course_material:
+                url = material.material_url.split('/')
+                url.pop()
+                course_id = url.pop()
+                prefix_path = "/".join(url)+"/"
+                files_list = get_assessment_files(prefix_path, course_id)
+                if material.course.title not in unique_course:
+                    unique_course[material.course.title] = files_list
+
+            files_list_ = [{"course_name": key, "file_list": value}
+                           for key, value in unique_course.items()]
+            return Response({"message": "success", "data": files_list_}, status=200)
+        except Assignment.DoesNotExist:
+            return Response({"message": "Assignment Material list is empty "}, status=204)
+
+
+class ModuleMatrialFileUpload(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, module_id=None, format=None):
+        module_obj = Module.objects.get(id=module_id)
+        files_list = get_assessment_files(
+            f'Material/Module/{module_obj.course.id}/', module_id)
+        return Response({"message": "Success", "list": files_list}, status=200)
+
+    def post(self, request, material_type=None, module_id=None, format=None):
+        if module_id is None:
+            return Response({"message": "module id is required"}, status=400)
+        try:
+            module_obj = Module.objects.get(id=int(module_id))
+
+            files = request.FILES['file']
+            file_name = str(int(time.time()) * 1000)+"_"+files.name
+            file_path = 'Material/Module/%s/%s/%s' % (
+                module_obj.course.id, module_id, file_name)
+
+            upload_status = upload_assessment_file(files, file_path)
+            if upload_status:
+                if not ModuleMaterial.objects.filter(
+                    module=module_obj,
+                    material_url=file_path
+                ).exists():
+                    module_material = ModuleMaterial(
+                        module=module_obj,
+                        material_url=file_path
+                    )
+                module_material.save()
+                return Response({"message": "File Uploaded Successfully", "path": file_path}, status=200)
+            else:
+                return Response({"message": "Failed to upload"}, status=400)
+        except Course.DoesNotExist:
+            return Response({"status": status.HTTP_404_NOT_FOUND, "message": "Module doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
+
+
+class StudentModuleMaterialList(APIView):
+
+    def get(self, request):
+        try:
+            try:
+                stu = get_object_or_404(Student, user_id=request.user.id)
+                module_material = ModuleMaterial.objects.filter(
+                    module__in=list(Module.objects.filter(is_deleted=False, id__in=list(Course.objects.filter(is_deleted=False, id__in=list(
+                        StudentCourse.objects.filter(student=stu.id).values_list("course", flat=True))).values_list("id", flat=True)))))
+            except Exception:
+                teacher = get_object_or_404(Teacher, user_id=request.user.id)
+                module_material = ModuleMaterial.objects.filter(module__in=list(
+                    Module.objects.filter(is_deleted=False, teacher__id=teacher.id)))
+            unique_module = dict()
+            for material in module_material:
+                url = material.material_url.split('/')
+                url.pop()
+                module_id = url.pop()
+                prefix_path = "/".join(url)+"/"
+                files_list = get_assessment_files(prefix_path, module_id)
+                if material.module.title not in unique_module:
+                    unique_module[material.module.title] = files_list
+
+            files_list_ = [{"module_name": key, "file_list": value}
+                           for key, value in unique_module.items()]
+            return Response({"message": "success", "data": files_list_}, status=200)
+        except Assignment.DoesNotExist:
+            return Response({"message": "Assignment Material list is empty "}, status=204)
+
+
 class AssignmentMatrialFileUpload(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -932,9 +1080,9 @@ class AssignmentMatrialFileUpload(APIView):
 class StudentAssignmentMaterialList(APIView):
     def get(self, request):
         try:
-            course_material = AssignmentMaterial.objects.all()
+            module_material = AssignmentMaterial.objects.all()
             files_list_ = []
-            for material in course_material:
+            for material in module_material:
                 url = material.material_url.split('/')
                 url.pop()
                 course_id = url.pop()
@@ -1004,7 +1152,7 @@ class StudentUploadedAssignmentList(APIView):
 
     def get(self, request):
         try:
-            files_list_ = []
+            files_list_ = []    
             assignments = Assignment.objects.filter(
                 teacher__user_id=request.user.id)
             # assignments = Assignment.objects.all()
@@ -1061,35 +1209,6 @@ class ZoomMeeting(APIView):
             return Response({"message": "Success", "files_list": files_list}, status=200)
 
 
-class StudentCourseMaterialList(APIView):
-
-    def get(self, request):
-        try:
-            try:
-                stu = get_object_or_404(Student, user_id=request.user.id)
-                course_material = CourseMaterial.objects.filter(
-                    course__in=list(Course.objects.filter(is_deleted=False, id__in=list(StudentCourse.objects.filter(student=stu.id).values_list("course", flat=True))).values_list("id", flat=True)))
-            except Exception:
-                teacher = get_object_or_404(Teacher, user_id=request.user.id)
-                course_material = CourseMaterial.objects.filter(course__in=list(
-                    Course.objects.filter(is_deleted=False, teacher__id=teacher.id)))
-            unique_course = dict()
-            for material in course_material:
-                url = material.material_url.split('/')
-                url.pop()
-                course_id = url.pop()
-                prefix_path = "/".join(url)+"/"
-                files_list = get_assessment_files(prefix_path, course_id)
-                if material.course.title not in unique_course:
-                    unique_course[material.course.title] = files_list
-
-            files_list_ = [{"course_name": key, "file_list": value}
-                           for key, value in unique_course.items()]
-            return Response({"message": "success", "data": files_list_}, status=200)
-        except Assignment.DoesNotExist:
-            return Response({"message": "Assignment Material list is empty "}, status=204)
-
-
 # @api_view(["POST"])
 # @renderer_classes((TemplateHTMLRenderer, JSONRenderer))
 def store_recording(request):
@@ -1113,7 +1232,7 @@ def store_recording(request):
             return Response({"message": "Recording could not be uploaded to aws storage"}, status=400)
 
 
-@api_view(['POST',])
+@ api_view(['POST',])
 def store_recording_video(request):
     files = request.FILES['file']
     file_name = f"./Videos/{files.name}"

@@ -5,7 +5,6 @@ import Modal from 'react-bootstrap/Modal';
 import api from "../../pages/api/api"
 
 function GenericModal(props) {
-
     function handleClose() {
         props.setShowModal(false);
         if (props && props.setDocKey) props.setDocKey(null)
@@ -18,7 +17,7 @@ function GenericModal(props) {
     }
     return (
         <>
-            <Modal show={props.showModal} onHide={handleClose} dialogClassName={props.xl ? "modal-xl" : ""} className={props.xl ? 'vidModal': ''}>
+            <Modal show={props.showModal} onHide={handleClose} dialogClassName={props.xl ? "modal-xl" : ""} className={props.xl ? 'vidModal' : ''}>
                 <Modal.Header closeButton>
                     {props.header}
                 </Modal.Header>

@@ -78,7 +78,7 @@ class ModuleQuizSerializer(serializers.ModelSerializer):
 class AssignmentSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=600, required=True)
     question = serializers.CharField(max_length=800)
-    course = serializers.CharField(max_length=800)
+    module = serializers.CharField(max_length=800)
     # file = serializers.FileField()
 
 

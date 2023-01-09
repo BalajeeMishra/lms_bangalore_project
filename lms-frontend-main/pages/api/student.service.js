@@ -12,6 +12,42 @@ const listCourseMaterial = () => {
     });
 };
 
+const listCourseDetails = () => {
+  return api
+    .get("/student_course_details")
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      // console.log(error)
+      return error.response;
+    });
+};
+
+const getCourseDetails = (category_id) => {
+  return api
+    .get(`/student_course_details/${category_id}`)
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      // console.log(error)
+      return error.response;
+    });
+};
+
+const listModuleMaterial = () => {
+  return api
+    .get("/student_module_material_list")
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      // console.log(error)
+      return error.response;
+    });
+};
+
 const listZoomRecords = () => {
   return api
     .get("/zoom")
@@ -45,9 +81,12 @@ const listfeedback = () => {
 
 const StudentService = {
   listCourseMaterial,
+  listCourseDetails,
+  getCourseDetails,
   listZoomRecords,
+  listModuleMaterial,
   createfeedback,
-  listfeedback
+  listfeedback,
 };
 
 export default StudentService;
