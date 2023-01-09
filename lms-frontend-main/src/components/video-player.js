@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import VideoJs from 'video.js'
-
+import 'video.js/dist/video-js.css';
 
 const videoJsOptions = {
     // techOrder: ['html5', 'flash'],
@@ -9,7 +9,8 @@ const videoJsOptions = {
     fluid: false,
     loop: false,
     width: '100%',
-    aspectRatio: '16:9'
+    // height: '100%',
+    aspectRatio: '12:5'
 }
 
 const VideoPlayer = ({ url, fileType }) => {
@@ -23,7 +24,6 @@ const VideoPlayer = ({ url, fileType }) => {
         <video class="video-js" />
       </div>
     `
-
 
 
         const player = VideoJs(videoContainer.current.querySelector('video'), videoJsOptions, async () => {
