@@ -6,6 +6,7 @@ import FacultyService from "./api/faculty.service";
 import ClipLoader from "react-spinners/ClipLoader";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import VideoPlayer from "../src/components/video-player";
 import { useRouter } from "next/router";
 import PageBanner from "../src/components/PageBanner";
 import Layout from "../src/layout/Layout";
@@ -106,11 +107,14 @@ const UploadVideo = () => {
   }
   function Content(props) {
     const docUrl = api.defaults.baseURL + "material?key=" + props.docKey;
-    return (
-      <>
-        <iframe width={"100%"} height={"100%"} src={docUrl} title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
-      </>
-    );
+
+    return <VideoPlayer url={docUrl} fileType="video/mp4" />
+    // return (
+    //   // <>
+    //   //   <iframe width={"100%"} height={"100%"} src={docUrl} title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+    //   // </>
+    //   <VideoPlayer fileType='video/mp4' url={docUrl} />
+    // );
   }
   function CardViewDoc(props) {
     const [showModal, setShowModal] = useState(false);
