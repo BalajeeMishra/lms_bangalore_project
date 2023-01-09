@@ -14,6 +14,9 @@ from pathlib import Path
 from datetime import timedelta
 
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-tl-gy%-w^z*@113k7lg0mpc6z_%m#*%+e0y(_a13o*i)*u20py'
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -101,10 +104,10 @@ DATABASES = {
         'NAME': 'lms_prod',
         'USER': 'postgres',
         # 'PASSWORD': 'Balajee123',
-        'PASSWORD': 'abc123',
+        'PASSWORD': os.environ.get("POSTGRES_PWD"),
         # 'PASSWORD': 'CaprA4rEgEbRUtrIxAch',
         # 'HOST': '3.111.73.127',
-        'HOST': 'localhost',
+        'HOST': os.environ.get("POSTGRES_HOST"),
         'PORT': '5432',
     }
 }
@@ -220,22 +223,22 @@ APPEND_SLASH = False
 # API_SEC = 'X2mZJGZA2wmrjy0LAMjgGRa9HjSnTE0xKnde'
 
 # old credentials of zoom
-API_KEY = 'pxo3_0CnRw6UwCaPRz1zsA'
-API_SEC = 'qOt6ErhMgoZQXaHaVQ4TsE812NyAXKxxU4Fb'
+API_KEY = os.environ.get('API_KEY')
+API_SEC = os.environ.get('API_SEC')
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-EMAIL_HOST_USER = "lmsaiml24@gmail.com"
-EMAIL_HOST_PASSWORD = 'shpvznmaptwyryzl'
-ENCRYPTION_KEY = "K125jgktQC-7Algihk0xO9MbrshfUx2-PTE-ztjHJIg="
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+ENCRYPTION_KEY = os.environ.get('ENCRYPTION_KEY')
 
 # production
 # AWS_KEY = "AKIAZCLTTESHN4SB4G4W"
 # AWS_SEC = "AQJRlgxbSDVbY4/8Vd1VXkvhgRC3/5iGug04A6YF"
-AWS_KEY = "AKIAW4HSXEZSXNY7GHXI"
-AWS_SEC = "Dpp6xU/TBMEnGxySsRy94elyZNTEY9z7p4Ntyh9e"
+AWS_KEY = os.environ.get('AWS_KEY')
+AWS_SEC = os.environ.get('AWS_SEC')
 # AWS_KEY = "AKIAW4HSXEZSULA24FWL"
 # AWS_SEC = "FZFTIAWHgO2qePQu3S6AlBmGUl9B9DDG+SU9KBEN"
 
@@ -244,27 +247,18 @@ AWS_SEC = "Dpp6xU/TBMEnGxySsRy94elyZNTEY9z7p4Ntyh9e"
 # AWS_SEC="FZFTIAWHgO2qePQu3S6AlBmGUl9B9DDG+SU9KBEN"
 # prodution
 # BUCKET_NAME = "sambodhieducationnestss3"
-BUCKET_NAME = "lms-utilitie-bucket"
-S3_LINK = "https://lms-utilitie-bucket.s3.ap-south-1.amazonaws.com/"
+BUCKET_NAME = os.environ.get("BUCKET_NAME")
+S3_LINK = os.environ.get("S3_LINK")
 
 
 # HOST_URL = "http://lmsmle.educationnest.com"
 HOST_URL = "http://127.0.0.1:3000"
 ENV = "Prod"
 
+CC_AVENUE_WORKING_KEY = os.environ.get("CC_AVENUE_WORKING_KEY")
+CC_AVENUE_MERCHANT_ID = os.environ.get("CC_AVENUE_MERCHANT_ID")
+CC_AVENUE_ACCESS_CODE = os.environ.get("CC_AVENUE_ACCESS_CODE")
+CC_AVENUE_REDIRECT_URL = os.environ.get("CC_AVENUE_REDIRECT_URL")
+CC_AVENUE_CANCEL_URL = os.environ.get("CC_AVENUE_CANCEL_URL")
 
-CC_AVENUE_WORKING_KEY = "7500363381B503AE4D6BF9689EF219EC"
-CC_AVENUE_MERCHANT_ID = "9002"
-CC_AVENUE_ACCESS_CODE = "AVHV68DL41BQ21VHQB"
-CC_AVENUE_REDIRECT_URL = "http://localhost:3000/checkout"
-CC_AVENUE_CANCEL_URL = "http://localhost:3000/checkout"
-
-TEXT_DECODE_SECRET_KEY = 'rHPbPJBI8ZeTGBZqrhX8yDDiFrAom9aTDui1omgX7hg='
-
-COUPON_PERMISSIONS = {
-    'CREATE': ['groupa', 'groupb'],
-    'LIST': ['groupa'],
-    'DELETE': ['groupb'],
-    'UPDATE': ['groupb'],
-    'REDEEMED': ['groupc'],
-}
+TEXT_DECODE_SECRET_KEY = os.environ.get('TEXT_DECODE_SECRET_KEY')

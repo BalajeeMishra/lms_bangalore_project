@@ -139,6 +139,7 @@ const Checkout = () => {
     });
     CartService.checkout(checkout)
       .then((res) => {
+        console.log(res)
         if (res && res.status === 200) {
           console.log(res.data.payment_url, "balajee mishraa okay lets start with it.");
           setTimeout(() => {
