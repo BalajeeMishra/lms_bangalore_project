@@ -68,7 +68,6 @@ class DoCheckout(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        print(request.data)
         request.data['user'] = request.user.id
         transaction_id = uuid.uuid4()
         request.data['id'] = transaction_id
@@ -95,7 +94,7 @@ class DoCheckout(APIView):
                 order_items = []
                 for p in data['cart']:
                     order_items.append(
-                        {"user": request.user.id, "order_id": transaction_id, "product_id": p['product']['course']})
+                        {"user": request.user.id, "order_id": transaction_id, "product_id": p['product']['course']['id']})
                 order_items_serializer = OrderItems(
                     data=order_items, many=True)
                 if order_items_serializer.is_valid():

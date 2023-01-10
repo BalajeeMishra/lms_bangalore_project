@@ -6,6 +6,7 @@ import FacultyService from "./api/faculty.service";
 import ClipLoader from "react-spinners/ClipLoader";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import VideoJS from "../src/components/video-player";
 import { useRouter } from "next/router";
 import PageBanner from "../src/components/PageBanner";
 import Layout from "../src/layout/Layout";
@@ -14,6 +15,10 @@ import GenericModal from "../src/components/GenericModal";
 import Accordion from "react-bootstrap/esm/Accordion";
 import api from "./api/api";
 import ReactPlayer from "react-player";
+import videojs from "video.js";
+// import videos from "../src/video/VIDEO.mp4";
+import { DefaultPlayer as Video } from "react-html5video";
+import "react-html5video/dist/styles.css";
 const UploadVideo = () => {
   const [input, setInput] = useState({
     course_id: "",
@@ -94,7 +99,6 @@ const UploadVideo = () => {
     };
     setSpinner(true);
     FacultyService.uploadVideo(data).then((res) => {
-      console.log(res, "response hello world");
       if (res.status == 201) {
         setSpinner(false);
         return toast.success("Success: video uploaded successfully");
@@ -105,14 +109,69 @@ const UploadVideo = () => {
     });
   }
   function Content(props) {
+    // url, fileType
     const docUrl = api.defaults.baseURL + "material?key=" + props.docKey;
-    console.log(docUrl, "docUrl balajee mishraaa ");
+    const playerRef = React.useRef(null);
+
+    const videoJsOptions = {
+      autoplay: true,
+      controls: true,
+      responsive: true,
+      fluid: true,
+      sources: [
+        {
+          src: "http://www.youtube.com/watch?v=m5T1NEFCqB4",
+          type: "video/mp4"
+        }
+      ]
+    };
+
+    const handlePlayerReady = (player) => {
+      playerRef.current = player;
+
+      // You can handle player events here, for example:
+      player.on("waiting", () => {
+        videojs.log("player is waiting");
+      });
+
+      player.on("dispose", () => {
+        videojs.log("player will dispose");
+      });
+    };
     return (
       <>
-        <iframe width={"100%"} height={"100%"} src={docUrl} title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+        {/* <VideoJS options={videoJsOptions} onReady={handlePlayerReady} /> */}
+        <ReactPlayer
+          // Disable download button
+          config={{ file: { attributes: { controlsList: "nodownload" } } }}
+          // Disable right click
+          onContextMenu={(e) => e.preventDefault()}
+          // Your props
+          // http://127.0.0.1:8000/material?key=Videos/17/11/Soloop_20220813020834.mp4
+          url="video/VIDEO.mp4"
+          className="react-player"
+          controls
+          width="50%"
+          height="50%"
+        />
+
+        {/* <iframe width={"100%"} height={"100%"} src={docUrl} title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe> */}
+        {/* <Video
+          autoPlay
+          loop
+          // muted
+          // controls={["PlayPause", "Seek", "Time", "Volume", "Fullscreen"]}
+          onCanPlayThrough={() => {
+            // Do stuff
+          }}
+        > */}
+        {/* <source src="https://www.youtube.com/shorts/srrLDAK4GNs" type="video/mp4" /> */}
+        {/* <track label="English" kind="subtitles" srcLang="en" src="http://source.vtt" default /> */}
+        {/* </Video> */}
       </>
     );
   }
+
   function CardViewDoc(props) {
     const [showModal, setShowModal] = useState(false);
     const [docKey, setDocKey] = useState(null);
@@ -233,19 +292,7 @@ const UploadVideo = () => {
             </div>
           </section>
           <ToastContainer autoClose={2000} />
-          {/* <ReactPlayer url="https://media.w3.org/2010/05/sintel/trailer_hd.mp4" /> */}
-          <ReactPlayer
-            // Disable download button
-            // config={{ file: { attributes: { controlsList: "nodownload" } } }}
-            // Disable right click
-            onContextMenu={(e) => e.preventDefault()}
-            // Your props
-            url="http://127.0.0.1:8000/material?key=Videos/17/11/Soloop_20220813020834.mp4"
-            className="react-player"
-            controls
-            width="50%"
-            height="50%"
-          />
+          <Content />
         </FacLayout>
       )}
     </>

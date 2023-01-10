@@ -1,7 +1,6 @@
 import React, { useState, useRef } from "react";
 import FacLayout from "./faculty";
 import VidRecordings from "../src/components/VidRecordings";
-
 const ViewRecordings = () => {
   return (
     <FacLayout>
