@@ -52,6 +52,12 @@ const Checkout = () => {
     const response = await CartService.couponVerification(couponCode);
     if (response.status == 200) {
       setDiscount(response.data.discount);
+      return toast.success("coupon code applied successfully");
+    }
+    if (response.status == 404) {
+      return toast.warning("Seems like you are entering the wrong code.Please enter the code carefully");
+    } else {
+      return toast.error("Something went wrong");
     }
   }
 
@@ -60,9 +66,7 @@ const Checkout = () => {
   }, []);
 
   useEffect(() => {
-    console.log("hey balajee do ittt");
     if (router?.query?.app_code || router?.query?.code) {
-      console.log("balajee mishra okay lets do it", router?.query?.code);
       setModalText({
         heading: "Payment",
         context: "Validating the data"
@@ -557,6 +561,8 @@ const Checkout = () => {
           {/* Thank you for your order. We are now redirecting you to CcAvenue to make payment. */}
         </Modal.Body>
       </Modal>
+
+      <ToastContainer autoClose={2000} />
     </Layout>
   );
 };

@@ -13,7 +13,7 @@ import Card from "react-bootstrap/Card";
 import GenericModal from "../src/components/GenericModal";
 import Accordion from "react-bootstrap/esm/Accordion";
 import api from "./api/api";
-
+import ReactPlayer from "react-player";
 const UploadVideo = () => {
   const [input, setInput] = useState({
     course_id: "",
@@ -72,7 +72,6 @@ const UploadVideo = () => {
 
   let course_List = [];
   if (courseList) {
-    console.log(courseList);
     courseList.forEach((element) => {
       course_List.push(
         <option key={element.id} value={element.id}>
@@ -84,6 +83,9 @@ const UploadVideo = () => {
 
   function submitForm() {
     let { course_id, video_file } = input;
+    if (!course_id || !video_file) {
+      return toast.error("Please enter all the data carefully");
+    }
     const formData = new FormData();
     formData.append("file", video_file);
     formData.append("course_id", course_id);
@@ -92,20 +94,19 @@ const UploadVideo = () => {
     };
     setSpinner(true);
     FacultyService.uploadVideo(data).then((res) => {
+      console.log(res, "response hello world");
       if (res.status == 201) {
         setSpinner(false);
-        toast.success("Success: video uploaded successfully");
-        router.push("/upload-video");
-        // alert("uploaded");
+        return toast.success("Success: video uploaded successfully");
       } else {
         setSpinner(false);
         return toast.error("somethig went wrong");
-        // alert(res.error);
       }
     });
   }
   function Content(props) {
     const docUrl = api.defaults.baseURL + "material?key=" + props.docKey;
+    console.log(docUrl, "docUrl balajee mishraaa ");
     return (
       <>
         <iframe width={"100%"} height={"100%"} src={docUrl} title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
@@ -183,6 +184,7 @@ const UploadVideo = () => {
     <>
       {spinner && (
         <FacLayout>
+          <div>Please wait while we are uploading the video</div>
           <ClipLoader />
         </FacLayout>
       )}
@@ -230,6 +232,20 @@ const UploadVideo = () => {
               </div>
             </div>
           </section>
+          <ToastContainer autoClose={2000} />
+          {/* <ReactPlayer url="https://media.w3.org/2010/05/sintel/trailer_hd.mp4" /> */}
+          <ReactPlayer
+            // Disable download button
+            // config={{ file: { attributes: { controlsList: "nodownload" } } }}
+            // Disable right click
+            onContextMenu={(e) => e.preventDefault()}
+            // Your props
+            url="http://127.0.0.1:8000/material?key=Videos/17/11/Soloop_20220813020834.mp4"
+            className="react-player"
+            controls
+            width="50%"
+            height="50%"
+          />
         </FacLayout>
       )}
     </>
