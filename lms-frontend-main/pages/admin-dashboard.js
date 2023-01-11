@@ -12,13 +12,16 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { checkIsSuperUser } from "../src/utils";
 import CouponCode from "../src/components/coupon-code";
+import FeedbackList from "../src/components/FeedbackList";
+// import Feedback from "react-bootstrap/esm/Feedback";
 
 function AdminDashBoard(props) {
   const [tab, setTab] = useState(1);
   const menuList = [
     { name: "Manage Course", link: "manage-course", icon: "fas fa-book-open", id: 2 },
     { name: "Manage Purchase", link: "purshase-manage", icon: "fas fa-cart-arrow-down", id: 3 },
-    { name: "Coupon Code", link: "coupon-code", icon: "fa fa-gift", id: 5 }
+    { name: "Coupon Code", link: "coupon-code", icon: "fa fa-gift", id: 5 },
+    { name: "Student feedback", link: "student-feedback", icon: "fa fa-comments", id: 6 }
     // {name: "Manage Users", link: "manage-users", icon: "fas fa-users", id: 4},
   ];
   const router = useRouter();
@@ -122,6 +125,14 @@ function AdminDashBoard(props) {
       <CouponCode />
     </>
   );
+
+  const Tab6 = () => {
+    return (
+      <>
+        <FeedbackList />
+      </>
+    );
+  };
 
   function redirectToTemplate(id) {
     window.location.href = "/course-template?id=" + id;
@@ -236,6 +247,7 @@ function AdminDashBoard(props) {
           {tab === 3 && <Tab3 />}
           {tab === 4 && <Tab4 />}
           {tab === 5 && <Tab5 />}
+          {tab === 6 && <Tab6 />}
         </div>
       </div>
       <ToastContainer autoClose={2000} />

@@ -4,12 +4,12 @@ const nextConfig = {
   swcMinify: true,
   async rewrites() {
     return [
-        {
-            source: '/course',
-            destination: 'http://learn.educationnest.com/course-detail/'
-        }
+      {
+        source: "/course",
+        destination: "http://learn.educationnest.com/course-detail/"
+      }
     ];
-}
-}
+  }
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

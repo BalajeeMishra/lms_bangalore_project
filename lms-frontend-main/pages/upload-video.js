@@ -148,7 +148,7 @@ const UploadVideo = () => {
           onContextMenu={(e) => e.preventDefault()}
           // Your props
           // http://127.0.0.1:8000/material?key=Videos/17/11/Soloop_20220813020834.mp4
-          url="video/VIDEO.mp4"
+          url={["/video/VIDEO.mp4"]}
           className="react-player"
           controls
           width="50%"

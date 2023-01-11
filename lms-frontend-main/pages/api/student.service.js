@@ -79,6 +79,17 @@ const listfeedback = () => {
     });
 };
 
+const deletefeedback = (id) => {
+  return api
+    .delete(`/feedback/${id}`)
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      return error.response;
+    });
+};
+
 const StudentService = {
   listCourseMaterial,
   listCourseDetails,
@@ -87,6 +98,7 @@ const StudentService = {
   listModuleMaterial,
   createfeedback,
   listfeedback,
+  deletefeedback
 };
 
 export default StudentService;
